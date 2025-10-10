@@ -2,19 +2,54 @@ name: Deploy to Dev
 
 on:
   push:
-    branches:
-      - dev
+    branches: [ dev ]
 
 jobs:
   deploy:
-    name: Deploy to Dev Server
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Deploy to Hostinger
+      # 1) Build frontend on the runner
+      - name: Use Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install & build assets
+        run: |
+          npm ci
+          npm run build
+        env:
+          # prevents some CI strictness from failing on warnings
+          CI: false
+
+      # 2) Deploy code (including public/build) to Hostinger
+      - name: Upload code to Hostinger
+        uses: easingthemes/ssh-deploy@v5.0.3
+        with:
+          REMOTE_HOST: ${{ secrets.SSH_HOST }}
+          REMOTE_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_KEY }}
+          REMOTE_PORT: ${{ secrets.SSH_PORT }}
+          SOURCE: "./"
+          TARGET: "${{ secrets.DEV_APP_DIR }}"
+          ARGS: "-az --delete"
+          EXCLUDE: >
+            .git*
+            node_modules/
+            vendor/
+            storage/framework/cache/*
+            storage/framework/sessions/*
+            storage/framework/views/*
+            storage/logs/*
+            .env
+            .github/
+
+      # 3) Run composer + laravel optimize on the server
+      - name: Finalize on server
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -23,62 +58,12 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            set -o pipefail
-            set -x  # Echo each command for debugging
-
-            APP_DIR="${{ secrets.DEV_APP_DIR }}"
-            cd "$APP_DIR"
-
-            echo "=== CURRENT DIRECTORY ==="
-            pwd
-            ls -la
-
-            echo "=== CONFIGURE SSH ==="
-            mkdir -p ~/.ssh && chmod 700 ~/.ssh
-            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts || true
-            chmod 600 ~/.ssh/known_hosts || true
-
-            echo "=== SAFE DIRECTORY FIX ==="
-            git config --global --add safe.directory "$APP_DIR"
-
-            echo "=== GIT REMOTE INFO ==="
-            git remote -v
-
-            echo "=== GIT FETCH & RESET ==="
-            git fetch origin dev
-            git checkout dev || true
-            git reset --hard origin/dev
-
-            echo "=== PHP & COMPOSER CHECK ==="
-            which php || true
-            php -v || true
-            which composer || true
-
-            # Composer fallback if not installed globally
-            if command -v composer >/dev/null 2>&1; then
-              COMPOSER_BIN="composer"
-            else
-              php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-              php composer-setup.php --quiet
-              rm composer-setup.php
-              COMPOSER_BIN="php composer.phar"
-            fi
-
-            export COMPOSER_ALLOW_SUPERUSER=1
-            $COMPOSER_BIN install --no-dev --prefer-dist --optimize-autoloader
-
-            echo "=== LARAVEL ARTISAN COMMANDS ==="
-            php artisan down || true
+            cd "${{ secrets.DEV_APP_DIR }}"
+            # install php deps without dev, optimized autoloader
+            composer install --no-dev --prefer-dist --optimize-autoloader
             php artisan migrate --force || true
-            php artisan config:clear
-            php artisan route:clear
-            php artisan view:clear
+            php artisan optimize:clear
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
-            php artisan optimize
-
             chmod -R 775 storage bootstrap/cache || true
-            php artisan up || true
-
-            echo "✅ Deployment complete!"
