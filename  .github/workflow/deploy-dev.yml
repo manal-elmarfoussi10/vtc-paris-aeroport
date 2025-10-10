@@ -12,11 +12,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # (Optional) Only to prove the workflow ran
-      - name: Show last commit
-        run: git log -1 --pretty=oneline
-
-      - name: Deploy via SSH (pull on server)
+      - name: Deploy to Hostinger
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -25,33 +21,23 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             set -e
-            APP_DIR="/home/u640295344/domains/dev.xn--vtc-paris-aroport-ltb.fr/public_html/vtc-paris-aeroport"
+            cd ${{ secrets.DEV_APP_DIR }}
 
-            cd "$APP_DIR"
-
-            # Ensure the repo is clean and up to date
             git fetch origin dev
+            git checkout dev || true
             git reset --hard origin/dev
 
-            # Install/optimize PHP deps
             composer install --no-dev --prefer-dist --optimize-autoloader
 
-            # Laravel maintenance window (optional)
             php artisan down || true
-
             php artisan migrate --force
             php artisan config:clear
             php artisan route:clear
             php artisan view:clear
-
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
             php artisan optimize
 
-            # Permissions (shared hosting friendly)
             chmod -R 775 storage bootstrap/cache || true
-            find storage -type d -exec chmod 775 {} \; || true
-            find bootstrap/cache -type d -exec chmod 775 {} \; || true
-
             php artisan up || true
