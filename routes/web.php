@@ -19,9 +19,8 @@ use App\Http\Controllers\Customer\CustomerDashboardController;
 | Public Pages
 |--------------------------------------------------------------------------
 */
-Route::get('/', function () {
-    return view('pages.home');
-})->name('home');
+// Home
+Route::view('/', 'home.index')->name('home');
 
 Route::get('/booking', [BookingController::class, 'index'])->name('booking');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
