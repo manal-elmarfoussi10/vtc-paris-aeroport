@@ -1,3 +1,19 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  deploy:
+    name: Deploy to Dev Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Deploy to Hostinger
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -36,7 +52,7 @@
             $COMPOSER_BIN install --no-dev --prefer-dist --optimize-autoloader
 
             php artisan down || true
-            php artisan migrate --force || true  # keep site up if DB not ready
+            php artisan migrate --force || true
             php artisan config:clear && php artisan route:clear && php artisan view:clear
             php artisan config:cache && php artisan route:cache && php artisan view:cache
             php artisan optimize
