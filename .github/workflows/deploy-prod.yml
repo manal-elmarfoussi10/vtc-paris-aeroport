@@ -1,0 +1,84 @@
+name: Deploy to Dev
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy to Dev Server
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Hostinger
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            set -e
+            set -o pipefail
+            set -x  # Echo each command for debugging
+
+            APP_DIR="${{ secrets.DEV_APP_DIR }}"
+            cd "$APP_DIR"
+
+            echo "=== CURRENT DIRECTORY ==="
+            pwd
+            ls -la
+
+            echo "=== CONFIGURE SSH ==="
+            mkdir -p ~/.ssh && chmod 700 ~/.ssh
+            ssh-keyscan -t ed25519 github.com >> ~/.ssh/known_hosts || true
+            chmod 600 ~/.ssh/known_hosts || true
+
+            echo "=== SAFE DIRECTORY FIX ==="
+            git config --global --add safe.directory "$APP_DIR"
+
+            echo "=== GIT REMOTE INFO ==="
+            git remote -v
+
+            echo "=== GIT FETCH & RESET ==="
+            git fetch origin dev
+            git checkout dev || true
+            git reset --hard origin/dev
+
+            echo "=== PHP & COMPOSER CHECK ==="
+            which php || true
+            php -v || true
+            which composer || true
+
+            # Composer fallback if not installed globally
+            if command -v composer >/dev/null 2>&1; then
+              COMPOSER_BIN="composer"
+            else
+              php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+              php composer-setup.php --quiet
+              rm composer-setup.php
+              COMPOSER_BIN="php composer.phar"
+            fi
+
+            export COMPOSER_ALLOW_SUPERUSER=1
+            $COMPOSER_BIN install --no-dev --prefer-dist --optimize-autoloader
+
+            echo "=== LARAVEL ARTISAN COMMANDS ==="
+            php artisan down || true
+            php artisan migrate --force || true
+            php artisan config:clear
+            php artisan route:clear
+            php artisan view:clear
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache
+            php artisan optimize
+
+            chmod -R 775 storage bootstrap/cache || true
+            php artisan up || true
+
+            echo "✅ Deployment complete!"
