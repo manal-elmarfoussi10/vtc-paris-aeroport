@@ -124,7 +124,7 @@
                             </li>
                         </ul>
                         <div class="mt-8">
-                            <a href="{{ route('airports.index') }}" class="text-blue-primary font-semibold hover:text-blue-700 transition duration-150 inline-flex items-center">
+                            <a href="{{ route('airports') }}" class="text-blue-primary font-semibold hover:text-blue-700 transition duration-150 inline-flex items-center">
                                 Voir tous les aéroports et gares
                                 <svg class="ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                             </a>
