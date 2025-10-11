@@ -12,7 +12,7 @@
             <div class="flex">
                 <div class="flex-shrink-0 flex items-center">
                     {{-- Passing 'is_dark' prop for the light logo version on dark background --}}
-                    @include('components.application-logo', ['is_dark' => true])
+                    @include('components.application-logo', ['is_dark' => true, 'class' => 'h-12 w-auto']) 
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex items-center">

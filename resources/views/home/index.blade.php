@@ -1,20 +1,13 @@
 @extends('layouts.app')
 
-{{--
-    File: resources/views/home/index.blade.php
-    Description: VISUAL OVERHAUL - Modern, engaging, and responsive home page.
-                 Includes high-contrast sections, cards, and dynamic imagery.
---}}
-
-@section('title', "Réservation VTC Paris | Transfert Aéroports CDG, Orly, Beauvais")
-@section('description', "Réservez votre VTC à Paris et vers les aéroports (CDG, Orly, Beauvais) avec un service premium. Chauffeurs professionnels, tarifs fixes, disponibilité 24/7.")
+... (omitted metadata) ...
 
 @section('content')
 
     <header class="relative bg-dark-navy overflow-hidden">
         {{-- High-quality, subtle background image --}}
         <div class="absolute inset-0">
-            <img class="w-full h-full object-cover opacity-10" 
+            <img class="w-full h-full object-cover opacity-30" {{-- INCREASED OPACITY to make it visible --}}
                  src="https://images.unsplash.com/photo-1549903072-5b7269fe2550?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
                  alt="Voiture VTC de nuit à Paris avec la Tour Eiffel en fond">
         </div>
@@ -28,7 +21,7 @@
                     Transferts **CDG, Orly, Beauvais** sans surprise. Chauffeurs professionnels, tarifs fixes garantis, et service sur mesure 24h/24.
                 </p>
                 
-                {{-- Booking CTA - More Prominent --}}
+                {{-- Booking CTA - Animations are already present here (hover:scale-[1.05], duration-500) --}}
                 <div class="mt-12 flex flex-col sm:flex-row gap-4">
                     <a href="{{ route('booking') }}" class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-lg font-bold rounded-xl shadow-2xl text-white bg-blue-primary hover:bg-blue-700 transition duration-500 transform hover:scale-[1.05] focus:outline-none focus:ring-4 focus:ring-blue-primary/50" aria-label="Réserver un VTC maintenant">
                         Calculer mon Tarif Fixe
@@ -54,8 +47,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
+        </header>
 
     <main>
 
