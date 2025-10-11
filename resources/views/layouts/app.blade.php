@@ -12,10 +12,10 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        {{-- ⚠️ IMPORTANT: Removing @vite and adding Tailwind CDN as per project constraints --}}
+        {{-- IMPORTANT: Using Tailwind CDN --}}
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
-            // Re-configure Tailwind for project colors (must match home/index.blade.php @once block)
+            // Re-configure Tailwind for custom colors
             tailwind.config = {
                 theme: {
                     extend: {
@@ -31,26 +31,23 @@
     </head>
     
     <body class="font-sans antialiased bg-light-grey">
-        <div class="min-h-screen">
+        <div class="min-h-screen flex flex-col"> {{-- Use flex-col to push footer to bottom --}}
             
-            {{-- Navigation (Fixed Top, includes logo) --}}
+            {{-- Navigation (Fixed Top) --}}
             @include('layouts.navigation')
 
-            {{-- Page Heading (Moved down to account for fixed header height) --}}
             @isset($header)
-                <header class="bg-white shadow pt-20"> {{-- Added pt-20 for fixed nav spacing --}}
+                <header class="bg-white shadow pt-20">
                     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>
-            @endisset
+            @endisset {{-- <-- FIX APPLIED: Closing the @isset block --}}
 
             <main class="flex-grow pt-20 sm:pt-24"> {{-- Added pt-20/pt-24 for fixed nav spacing --}}
-                {{-- FIX APPLIED: Replaced $slot with @yield('content') for traditional Blade sections --}}
                 @yield('content')
             </main>
             
-            {{-- Global Footer --}}
             @include('layouts.footer')
             
         </div>
