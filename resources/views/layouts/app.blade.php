@@ -15,14 +15,17 @@
         {{-- IMPORTANT: Using Tailwind CDN --}}
         <script src="https://cdn.tailwindcss.com"></script>
         <script>
-            // Re-configure Tailwind for custom colors
             tailwind.config = {
                 theme: {
                     extend: {
                         colors: {
-                            'blue-primary': '#1D4ED8', // Primary Blue
-                            'dark-navy': '#0F172A', // Dark Navy
-                            'light-grey': '#F8FAFC', // Light Grey
+                            'blue-primary': '#1D4ED8',
+                            'dark-navy': '#0F172A',
+                            'light-grey': '#F8FAFC',
+                        },
+                        // Add custom animation for a single pulse effect (optional)
+                        animation: {
+                            'pulse-once': 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) 1',
                         }
                     }
                 }
