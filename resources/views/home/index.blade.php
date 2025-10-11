@@ -2,8 +2,7 @@
 
 {{--
     File: resources/views/home/index.blade.php
-    Description: MIMICKING LINGUANA STYLE - High-contrast, dark-mode design with
-                 prominent imagery and subtle animations using pure Tailwind.
+    Description: FULL SCREEN VIDEO BACKGROUND + LINGUANA STYLE CONTENT SECTIONS
 --}}
 
 @section('title', "Réservation VTC Paris | Transfert Aéroports CDG, Orly, Beauvais")
@@ -11,25 +10,34 @@
 
 @section('content')
 
-    <header class="relative bg-dark-navy overflow-hidden">
-        {{-- High-quality, subtle background image (now a specific car image) --}}
-        <div class="absolute inset-0">
-            {{-- Image of a luxury car at night in Paris --}}
-            <img class="w-full h-full object-cover opacity-30" 
-                 src="https://images.unsplash.com/photo-1596707323116-24e5a95400d7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                 alt="Luxury VTC sedan in Paris at night">
-        </div>
+    <header class="relative w-full h-screen overflow-hidden bg-dark-navy"> {{-- h-screen ensures full viewport height --}}
         
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32 lg:py-40 text-white">
+        {{-- Video Background Container --}}
+        <div class="absolute inset-0 z-0">
+            <video autoplay loop muted playsinline class="w-full h-full object-cover">
+                <source src="{{ asset('video_bg.mp4') }}" type="video/mp4">
+                {{-- Fallback image for older browsers or if video doesn't load --}}
+                <img src="https://images.unsplash.com/photo-1596707323116-24e5a95400d7?q=80&w=2070&auto=format&fit=crop" 
+                     alt="Luxury VTC sedan in Paris at night" 
+                     class="w-full h-full object-cover">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        {{-- Dark Overlay for Readability (Crucial) --}}
+        <div class="absolute inset-0 bg-dark-navy/60 z-10"></div>
+        
+        {{-- Content Container (Z-20 must be higher than overlay) --}}
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center pt-20 z-20 text-white">
             <div class="lg:w-2/3">
-                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight">
+                <h1 class="text-5xl sm:text-7xl lg:text-8xl font-extrabold tracking-tight">
                     <span class="text-blue-primary">Service VTC</span> <br>Premium à Paris.
                 </h1>
-                <p class="mt-6 text-xl text-gray-200 leading-relaxed max-w-lg">
+                <p class="mt-6 text-xl text-gray-200 leading-relaxed max-w-xl">
                     Transferts **CDG, Orly, Beauvais** sans surprise. L'élégance, la ponctualité, et le professionnalisme.
                 </p>
                 
-                {{-- Booking CTA - Uses a subtle pulsing animation for attention --}}
+                {{-- Booking CTA --}}
                 <div class="mt-12 flex flex-col sm:flex-row gap-4">
                     <a href="{{ route('booking') }}" class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-lg font-bold rounded-full shadow-2xl text-white bg-blue-primary hover:bg-blue-700 transition duration-300 transform hover:scale-105 animate-pulse-once" aria-label="Réserver un VTC maintenant">
                         Calculer mon Tarif Fixe
@@ -38,9 +46,15 @@
                         Découvrir la Flotte
                     </a>
                 </div>
+            </div>
+        </div>
+    </header>
 
-                {{-- Feature Bar below Hero --}}
-                <div class="mt-20 bg-white/10 backdrop-blur-sm p-6 rounded-2xl shadow-2xl grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/20">
+    <main>
+        
+        <section class="bg-dark-navy -mt-20 relative z-20"> {{-- Negative margin pulls it up over the video section --}}
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-t-2xl shadow-2xl grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/20">
                     <div class="flex flex-col items-center py-4 text-gray-200">
                         <svg class="h-8 w-8 text-blue-primary mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V9m0 3v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span class="font-bold text-lg">Tarif Fixe</span>
@@ -55,10 +69,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </header>
-
-    <main>
+        </section>
 
         <section id="vehicle-showcase" class="py-20 sm:py-32 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
