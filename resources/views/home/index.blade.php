@@ -5,6 +5,7 @@
     Description: Home page for VTC Paris Aéroport. Modern, responsive design with
                  Hero, Value Propositions, Services, Airport Links, Reviews, and CTA.
     Tech: Laravel Blade + Tailwind CSS CDN.
+    FIX: Corrected route('airports.index') to route('airports').
 --}}
 
 @section('title', "Réservation VTC Paris | Transfert Aéroports CDG, Orly, Beauvais")
@@ -124,6 +125,7 @@
                             </li>
                         </ul>
                         <div class="mt-8">
+                            {{-- FIX APPLIED: Changed route('airports.index') to the correct route('airports') --}}
                             <a href="{{ route('airports') }}" class="text-blue-primary font-semibold hover:text-blue-700 transition duration-150 inline-flex items-center">
                                 Voir tous les aéroports et gares
                                 <svg class="ml-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
@@ -259,12 +261,10 @@
 
     </main>
 
-    {{-- The footer will be included by the 'layouts.app' file --}}
-
 @endsection
 
 @once
-    {{-- This section is only for the CDN setup, placed typically in layouts/app.blade.php's <head> --}}
+    {{-- Tailwind CDN configuration for custom colors --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
