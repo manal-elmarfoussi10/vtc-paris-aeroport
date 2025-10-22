@@ -20,21 +20,35 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ $nav_text_class }}">
-                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                        {{ __('Accueil') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('booking')" :active="request()->routeIs('booking')">
-                        {{ __('Réserver') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('services.index')" :active="request()->routeIs('services.index')">
-                        {{ __('Services') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('airports.index')" :active="request()->routeIs('airports.index')">
-                        {{ __('Aéroports') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
-                        {{ __('Contact') }}
-                    </x-nav-link>
+            {{-- Accueil --}}
+<x-nav-link href="{{ route('home') }}" :active="request()->routeIs('home')">
+    {{ __('Accueil') }}
+</x-nav-link>
+
+{{-- Réserver --}}
+<x-nav-link href="{{ route('booking') }}" :active="request()->routeIs('booking*')">
+    {{ __('Réserver') }}
+</x-nav-link>
+
+{{-- Services --}}
+<x-nav-link href="{{ route('services') }}" :active="request()->routeIs('services')">
+    {{ __('Services') }}
+</x-nav-link>
+
+{{-- Aéroports --}}
+<x-nav-link href="{{ route('airports') }}" :active="request()->routeIs('airports*')">
+    {{ __('Aéroports') }}
+</x-nav-link>
+
+{{-- FAQ --}}
+<x-nav-link href="{{ route('faq') }}" :active="request()->routeIs('faq')">
+    {{ __('FAQ') }}
+</x-nav-link>
+
+{{-- Contact --}}
+<x-nav-link href="{{ route('contact') }}" :active="request()->routeIs('contact')">
+    {{ __('Contact') }}
+</x-nav-link>
                 </div>
             </div>
 
