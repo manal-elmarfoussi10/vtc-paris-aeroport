@@ -23,11 +23,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('admin', fn (User $user) => $user->role === 'admin');
         Gate::define('customer', fn (User $user) => $user->role === 'customer');
 
-        // Register the setting helper function
-        if (!function_exists('setting')) {
-            function setting($key, $default = null) {
-                return \App\Models\Setting::get($key, $default);
-            }
-        }
+
     }
 }
