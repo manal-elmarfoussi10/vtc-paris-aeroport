@@ -31,12 +31,12 @@
 </x-nav-link>
 
 {{-- Services --}}
-<x-nav-link href="{{ route('services') }}" :active="request()->routeIs('services')">
+<x-nav-link href="{{ route('services.index') }}" :active="request()->routeIs('services.index')">
     {{ __('Services') }}
 </x-nav-link>
 
 {{-- Aéroports --}}
-<x-nav-link href="{{ route('airports') }}" :active="request()->routeIs('airports*')">
+<x-nav-link href="{{ route('airports.index') }}" :active="request()->routeIs('airports*')">
     {{ __('Aéroports') }}
 </x-nav-link>
 

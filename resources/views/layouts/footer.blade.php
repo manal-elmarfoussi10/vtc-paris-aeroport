@@ -22,8 +22,8 @@
                 <ul class="space-y-2">
                     <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-white transition duration-200">Accueil</a></li>
                     <li><a href="{{ route('booking') }}" class="text-gray-300 hover:text-white transition duration-200">Réserver</a></li>
-                    <li><a href="{{ route('services') }}" class="text-gray-300 hover:text-white transition duration-200">Services</a></li>
-                    <li><a href="{{ route('airports') }}" class="text-gray-300 hover:text-white transition duration-200">Aéroports</a></li>
+                    <li><a href="{{ route('services.index') }}" class="text-gray-300 hover:text-white transition duration-200">Services</a></li>
+                    <li><a href="{{ route('airports.index') }}" class="text-gray-300 hover:text-white transition duration-200">Aéroports</a></li>
                     <li><a href="{{ route('faq') }}" class="text-gray-300 hover:text-white transition duration-200">FAQ</a></li>
                     <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white transition duration-200">Contact</a></li>
                 </ul>

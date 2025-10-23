@@ -25,9 +25,9 @@ Route::view('/', 'home.index')->name('home');
 Route::get('/booking', [BookingController::class, 'index'])->name('booking');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 
-Route::get('/services', [ServiceController::class, 'index'])->name('services');
+Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
 
-Route::get('/airports', [AirportController::class, 'index'])->name('airports');
+Route::get('/airports', [AirportController::class, 'index'])->name('airports.index');
 Route::get('/airports/{slug}', [AirportController::class, 'show'])->name('airports.show');
 
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');

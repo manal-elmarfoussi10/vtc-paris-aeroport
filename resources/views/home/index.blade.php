@@ -42,7 +42,7 @@
                     <a href="{{ route('booking') }}" class="inline-flex items-center justify-center px-10 py-4 border border-transparent text-lg font-bold rounded-full shadow-2xl text-white bg-blue-primary hover:bg-blue-700 transition duration-300 transform hover:scale-105 animate-pulse-once" aria-label="Réserver un VTC maintenant">
                         Calculer mon Tarif Fixe
                     </a>
-                    <a href="{{ route('services') }}" class="inline-flex items-center justify-center px-10 py-4 border border-white text-lg font-medium rounded-full text-white hover:bg-white hover:text-dark-navy transition duration-300 transform hover:scale-105">
+                    <a href="{{ route('services.index') }}" class="inline-flex items-center justify-center px-10 py-4 border border-white text-lg font-medium rounded-full text-white hover:bg-white hover:text-dark-navy transition duration-300 transform hover:scale-105">
                         Découvrir la Flotte
                     </a>
                 </div>

@@ -18,9 +18,16 @@ class AppServiceProvider extends ServiceProvider
         // Define authorization gates for roles
         Gate::define('isAdmin', fn (User $user) => $user->role === 'admin');
         Gate::define('isCustomer', fn (User $user) => $user->role === 'customer');
-        
+
         // Backward compatibility gates
         Gate::define('admin', fn (User $user) => $user->role === 'admin');
         Gate::define('customer', fn (User $user) => $user->role === 'customer');
+
+        // Register the setting helper function
+        if (!function_exists('setting')) {
+            function setting($key, $default = null) {
+                return \App\Models\Setting::get($key, $default);
+            }
+        }
     }
 }
