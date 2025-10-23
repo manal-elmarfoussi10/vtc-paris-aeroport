@@ -3,7 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Gate;   // ✅ correct facade
+use Illuminate\Support\Facades\Gate;
 use App\Models\User;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,7 +15,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Optional: simple role gates if you want to keep them here
+        // Define authorization gates for roles
+        Gate::define('isAdmin', fn (User $user) => $user->role === 'admin');
+        Gate::define('isCustomer', fn (User $user) => $user->role === 'customer');
+        
+        // Backward compatibility gates
         Gate::define('admin', fn (User $user) => $user->role === 'admin');
         Gate::define('customer', fn (User $user) => $user->role === 'customer');
     }

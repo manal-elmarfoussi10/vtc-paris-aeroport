@@ -7,6 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class Service extends Model
 {
     protected $fillable = [
-        'slug', 'name', 'subtitle', 'description', 'icon', 'is_active',
+        'slug', 'name', 'subtitle', 'description', 'icon', 'order', 'is_active',
     ];
 }

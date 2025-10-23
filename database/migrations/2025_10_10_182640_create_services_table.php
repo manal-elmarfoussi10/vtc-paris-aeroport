@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->string('subtitle')->nullable();
             $table->text('description')->nullable();
             $table->string('icon')->nullable();    // e.g., 'briefcase', 'plane', etc.
+            $table->unsignedInteger('order')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

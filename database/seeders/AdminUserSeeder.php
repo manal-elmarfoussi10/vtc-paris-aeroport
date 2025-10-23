@@ -11,12 +11,16 @@ class AdminUserSeeder extends Seeder
     public function run(): void
     {
         User::updateOrCreate(
-            ['email' => 'admin@vtc-paris.fr'],
+            ['email' => 'admin@vtcparis.fr'],
             [
-                'name' => 'Admin',
-                'password' => Hash::make('password123'), // change later
+                'name' => 'Administrateur VTC Paris',
+                'phone' => '+33 1 23 45 67 89',
+                'password' => Hash::make('Admin@2025!'),
                 'role' => 'admin',
+                'email_verified_at' => now(),
             ]
         );
+
+        $this->command->info('Admin user created: admin@vtcparis.fr / Admin@2025!');
     }
 }

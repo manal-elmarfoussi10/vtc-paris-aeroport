@@ -61,11 +61,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
         Route::resource('/bookings', BookingAdminController::class);
+        Route::get('/bookings-export', [BookingAdminController::class, 'export'])->name('bookings.export');
         Route::resource('/customers', CustomerAdminController::class);
         Route::resource('/vehicles', VehicleAdminController::class);
+        Route::post('/vehicles/{vehicle}/toggle-active', [VehicleAdminController::class, 'toggleActive'])->name('vehicles.toggle-active');
         Route::get('/calendar', [AdminDashboardController::class, 'calendar'])->name('calendar');
         Route::get('/settings', [SettingAdminController::class, 'index'])->name('settings');
         Route::post('/settings', [SettingAdminController::class, 'update'])->name('settings.update');
+        Route::post('/settings/reset', [SettingAdminController::class, 'reset'])->name('settings.reset');
     });
 
     /*
@@ -77,6 +80,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/dashboard', [CustomerDashboardController::class, 'index'])->name('dashboard');
         Route::get('/bookings', [CustomerDashboardController::class, 'bookings'])->name('bookings');
         Route::get('/bookings/{id}', [CustomerDashboardController::class, 'show'])->name('bookings.show');
+        Route::post('/bookings/{id}/cancel', [CustomerDashboardController::class, 'cancel'])->name('bookings.cancel');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     });
