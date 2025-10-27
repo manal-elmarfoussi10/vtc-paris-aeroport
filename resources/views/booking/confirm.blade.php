@@ -15,7 +15,7 @@
                 </svg>
             </div>
             <h1 class="text-3xl font-bold text-gray-900 mb-2">Réservation confirmée !</h1>
-            <p class="text-lg text-gray-600">Votre chauffeur vous contactera bientôt</p>
+            <p class="text-lg text-gray-600">Votre réservation a été créée avec succès. Un email de confirmation vous sera envoyé sous peu.</p>
         </div>
 
         {{-- Booking Details --}}

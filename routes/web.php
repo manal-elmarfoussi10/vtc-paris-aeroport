@@ -39,7 +39,7 @@ Route::post('/contact', [ContactController::class, 'send'])->name('contact.send'
 | Authenticated Users
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     // General dashboard (redirects based on role)
     Route::get('/dashboard', function () {
@@ -64,12 +64,19 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/bookings-export', [BookingAdminController::class, 'export'])->name('bookings.export');
         Route::resource('/customers', CustomerAdminController::class);
         Route::resource('/vehicles', VehicleAdminController::class);
-        Route::post('/vehicles/{vehicle}/toggle-active', [VehicleAdminController::class, 'toggleActive'])->name('vehicles.toggle-active');
+        Route::patch('/vehicles/{vehicle}/toggle-active', [VehicleAdminController::class, 'toggleActive'])->name('vehicles.toggle-active');
+        Route::resource('/contact-messages', ContactMessageAdminController::class)->names([
+            'index' => 'contact-messages.index',
+            'show' => 'contact-messages.show',
+            'destroy' => 'contact-messages.destroy',
+        ]);
         Route::get('/calendar', [AdminDashboardController::class, 'calendar'])->name('calendar');
         Route::get('/settings', [SettingAdminController::class, 'index'])->name('settings');
         Route::post('/settings', [SettingAdminController::class, 'update'])->name('settings.update');
         Route::post('/settings/reset', [SettingAdminController::class, 'reset'])->name('settings.reset');
-    });
+        // API routes for calendar
+        Route::get('/api/vehicles', [VehicleAdminController::class, 'apiIndex']);
+        Route::get('/api/bookings/{booking}', [BookingAdminController::class, 'apiShow']);    });
 
     /*
     |--------------------------------------------------------------------------

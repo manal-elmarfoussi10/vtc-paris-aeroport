@@ -28,6 +28,12 @@ class AdminDashboardController extends Controller
             'pending_bookings' => Booking::where('status', 'new')->count(),
         ];
 
+        // Today's bookings
+        $todayBookings = Booking::with('user', 'vehicle')
+            ->whereDate('pickup_time', $today)
+            ->orderBy('pickup_time')
+            ->get();
+
         // Upcoming pickups (next 24 hours)
         $upcomingPickups = Booking::with('user', 'vehicle')
             ->where('status', 'confirmed')
@@ -43,7 +49,7 @@ class AdminDashboardController extends Controller
             ->limit(10)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'upcomingPickups', 'recentBookings'));
+        return view('admin.dashboard', compact('stats', 'todayBookings', 'upcomingPickups', 'recentBookings'));
     }
 
     public function calendar()

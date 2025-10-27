@@ -106,9 +106,9 @@
                 <h2 class="text-lg font-semibold text-gray-900">Prochaines prises en charge</h2>
             </div>
 
-            @if($upcomingBookings->count() > 0)
+            @if($upcomingPickups->count() > 0)
                 <div class="divide-y divide-gray-200">
-                    @foreach($upcomingBookings as $booking)
+                    @foreach($upcomingPickups as $booking)
                         <div class="p-6 hover:bg-gray-50">
                             <div class="flex items-center justify-between">
                                 <div class="flex-1">

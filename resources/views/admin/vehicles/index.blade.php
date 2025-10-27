@@ -71,12 +71,11 @@
 
                         {{-- Toggle Active --}}
                         <div class="mt-4 pt-4 border-t border-gray-200">
-                            <form method="POST" action="{{ route('admin.vehicles.toggle', $vehicle->id) }}" class="flex items-center justify-between">
+                            <form method="POST" action="{{ route('admin.vehicles.toggle-active', $vehicle->id) }}" class="flex items-center justify-between">
                                 @csrf
-                                @method('PATCH')
                                 <span class="text-sm text-gray-600">Actif</span>
-                                <button type="submit" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent {{ $vehicle->active ? 'bg-blue-primary' : 'bg-gray-200' }} transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-primary focus:ring-offset-2" role="switch" aria-checked="{{ $vehicle->active ? 'true' : 'false' }}">
-                                    <span class="translate-x-0 inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $vehicle->active ? 'translate-x-5' : 'translate-x-0' }}"></span>
+                                <button type="submit" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent {{ $vehicle->is_active ? 'bg-blue-primary' : 'bg-gray-200' }} transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-primary focus:ring-offset-2" role="switch" aria-checked="{{ $vehicle->is_active ? 'true' : 'false' }}">
+                                    <span class="translate-x-0 inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out {{ $vehicle->is_active ? 'translate-x-5' : 'translate-x-0' }}"></span>
                                 </button>
                             </form>
                         </div>

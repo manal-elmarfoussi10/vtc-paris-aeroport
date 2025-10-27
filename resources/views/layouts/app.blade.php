@@ -34,9 +34,13 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans antialiased">
-        <div class="min-h-screen bg-light-grey flex flex-col">
+        <div class="min-h-screen bg-gray-50 flex flex-col">
 
-            @include('layouts.navigation')
+            @hasSection('navigation')
+                @yield('navigation')
+            @else
+                @include('layouts.navigation')
+            @endif
 
             @hasSection('header')
                 <header class="bg-white shadow">

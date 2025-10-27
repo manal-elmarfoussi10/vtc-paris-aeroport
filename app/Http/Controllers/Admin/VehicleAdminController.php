@@ -25,7 +25,7 @@ class VehicleAdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'class' => 'required|in:sedan,business,van',
+            'class' => 'required|in:sedan,business,van,berline,suv,luxury',
             'capacity_pax' => 'required|integer|min:1|max:8',
             'capacity_luggage' => 'required|integer|min:0|max:8',
             'base_rate' => 'required|numeric|min:0',
@@ -43,6 +43,9 @@ class VehicleAdminController extends Controller
         }
 
         $validated['is_active'] = $request->boolean('is_active', true);
+
+        // Generate slug from name
+        $validated['slug'] = Str::slug($validated['name']);
 
         Vehicle::create($validated);
 
@@ -64,7 +67,7 @@ class VehicleAdminController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'class' => 'required|in:sedan,business,van',
+            'class' => 'required|in:sedan,business,van,berline,suv,luxury',
             'capacity_pax' => 'required|integer|min:1|max:8',
             'capacity_luggage' => 'required|integer|min:0|max:8',
             'base_rate' => 'required|numeric|min:0',
@@ -87,6 +90,11 @@ class VehicleAdminController extends Controller
         }
 
         $validated['is_active'] = $request->boolean('is_active', true);
+
+        // Generate slug from name if name is being updated
+        if (isset($validated['name'])) {
+            $validated['slug'] = Str::slug($validated['name']);
+        }
 
         $vehicle->update($validated);
 
@@ -126,5 +134,10 @@ class VehicleAdminController extends Controller
         $status = $vehicle->is_active ? 'activé' : 'désactivé';
 
         return back()->with('success', "Véhicule {$status} avec succès.");
+    }
+
+    public function apiIndex()
+    {
+        return Vehicle::select('id', 'name')->get();
     }
 }

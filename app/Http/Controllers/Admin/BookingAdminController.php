@@ -249,4 +249,8 @@ class BookingAdminController extends Controller
 
         return response()->stream($callback, 200, $headers);
     }
+    public function apiShow(Booking $booking)
+    {
+        return $booking->load('user', 'vehicle');
+    }
 }

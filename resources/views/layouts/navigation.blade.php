@@ -3,69 +3,76 @@
 @php
     // Check if the current route is the home page
     $is_home = Route::currentRouteName() === 'home';
-    
-    // Set classes based on whether it's the home page
-    $nav_bg_class = $is_home ? 'bg-transparent absolute top-0 left-0 w-full z-30' : 'bg-dark-navy shadow fixed top-0 left-0 w-full z-30';
-    $nav_text_class = $is_home ? 'text-white' : 'text-gray-200';
-    $logo_is_dark = $is_home; // Use light logo version on dark/video background
+
+    if ($is_home) {
+        // Home page header integrated into hero background
+        $nav_bg_class = 'bg-transparent absolute top-0 left-0 w-full z-50';
+        $nav_text_class = 'text-white text-lg font-medium';
+        $logo_is_dark = true; // Use dark logo on dark background
+    } else {
+        // Other pages with white background
+        $nav_bg_class = 'bg-white shadow-lg fixed top-0 left-0 w-full z-50 border-b border-gray-100';
+        $nav_text_class = 'text-gray-800';
+        $logo_is_dark = false; // Use light logo on white background
+    }
 @endphp
 
-<nav x-data="{ open: false }" class="{{ $nav_bg_class }} transition duration-500">
+<nav x-data="{ open: false }" class="{{ $nav_bg_class }} transition-all duration-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-20">
-            <div class="flex">
-                <div class="flex-shrink-0 flex items-center">
-                    {{-- Passing is_dark and class props --}}
-                    @include('components.application-logo', ['is_dark' => $logo_is_dark, 'class' => 'h-12 w-auto']) 
-                </div>
+        <div class="flex justify-between items-center h-28">
+            <div class="flex-shrink-0">
+                {{-- Much larger, prominent logo --}}
+                @include('components.application-logo', ['is_dark' => $logo_is_dark, 'class' => 'h-20 w-auto'])
+            </div>
 
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex {{ $nav_text_class }}">
-            {{-- Accueil --}}
-<x-nav-link href="{{ route('home') }}" :active="request()->routeIs('home')">
-    {{ __('Accueil') }}
-</x-nav-link>
+            <div class="flex-1 flex justify-center">
+                <div class="hidden space-x-10 sm:flex {{ $nav_text_class }}">
+                    {{-- Accueil --}}
+                    <x-nav-link href="{{ route('home') }}" :active="request()->routeIs('home')" class="text-gray-700 hover:text-blue-primary transition-colors duration-200 font-semibold text-lg px-3 py-2 rounded-lg hover:bg-blue-50">
+                        {{ __('Accueil') }}
+                    </x-nav-link>
 
-{{-- Réserver --}}
-<x-nav-link href="{{ route('booking') }}" :active="request()->routeIs('booking*')">
-    {{ __('Réserver') }}
-</x-nav-link>
+                    {{-- Réserver --}}
+                    <x-nav-link href="{{ route('booking') }}" :active="request()->routeIs('booking*')" class="text-gray-700 hover:text-blue-primary transition-colors duration-200 font-semibold text-lg px-3 py-2 rounded-lg hover:bg-blue-50">
+                        {{ __('Réserver') }}
+                    </x-nav-link>
 
-{{-- Services --}}
-<x-nav-link href="{{ route('services.index') }}" :active="request()->routeIs('services.index')">
-    {{ __('Services') }}
-</x-nav-link>
+                    {{-- Services --}}
+                    <x-nav-link href="{{ route('services.index') }}" :active="request()->routeIs('services.index')" class="text-gray-700 hover:text-blue-primary transition-colors duration-200 font-semibold text-lg px-3 py-2 rounded-lg hover:bg-blue-50">
+                        {{ __('Services') }}
+                    </x-nav-link>
 
-{{-- Aéroports --}}
-<x-nav-link href="{{ route('airports.index') }}" :active="request()->routeIs('airports*')">
-    {{ __('Aéroports') }}
-</x-nav-link>
+                    {{-- Aéroports --}}
+                    <x-nav-link href="{{ route('airports.index') }}" :active="request()->routeIs('airports*')" class="text-gray-700 hover:text-blue-primary transition-colors duration-200 font-semibold text-lg px-3 py-2 rounded-lg hover:bg-blue-50">
+                        {{ __('Aéroports') }}
+                    </x-nav-link>
 
-{{-- FAQ --}}
-<x-nav-link href="{{ route('faq') }}" :active="request()->routeIs('faq')">
-    {{ __('FAQ') }}
-</x-nav-link>
+                    {{-- FAQ --}}
+                    <x-nav-link href="{{ route('faq') }}" :active="request()->routeIs('faq')" class="text-gray-700 hover:text-blue-primary transition-colors duration-200 font-semibold text-lg px-3 py-2 rounded-lg hover:bg-blue-50">
+                        {{ __('FAQ') }}
+                    </x-nav-link>
 
-{{-- Contact --}}
-<x-nav-link href="{{ route('contact') }}" :active="request()->routeIs('contact')">
-    {{ __('Contact') }}
-</x-nav-link>
+                    {{-- Contact --}}
+                    <x-nav-link href="{{ route('contact') }}" :active="request()->routeIs('contact')" class="text-gray-700 hover:text-blue-primary transition-colors duration-200 font-semibold text-lg px-3 py-2 rounded-lg hover:bg-blue-50">
+                        {{ __('Contact') }}
+                    </x-nav-link>
                 </div>
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 {{-- Booking Button (Always prominent) --}}
-                <a href="{{ route('booking') }}" class="px-5 py-2 border border-blue-primary text-sm font-medium rounded-full text-white bg-blue-primary hover:bg-blue-700 transition duration-300 mr-4">
+                <a href="{{ route('booking') }}" class="px-6 py-3 border border-blue-primary text-sm font-semibold rounded-full text-white bg-blue-primary hover:bg-blue-700 hover:shadow-lg transform hover:scale-105 transition-all duration-300 mr-6 shadow-md">
                     Calculer mon tarif
                 </a>
-                
+
                 <div class="relative">
                     <x-dropdown align="right" width="48">
                         {{-- Dropdown Trigger (Authentication Links) --}}
                         <x-slot name="trigger">
-                            <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md {{ $nav_text_class }} bg-transparent hover:text-gray-300 focus:outline-none transition ease-in-out duration-150">
-                                <div>@auth {{ Auth::user()->name }} @else Connexion / Compte @endauth</div>
-                                <div class="ml-1">
-                                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <button class="inline-flex items-center px-4 py-2 border border-gray-200 text-sm leading-4 font-medium rounded-lg {{ $nav_text_class }} bg-gray-50 hover:bg-gray-100 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent transition-all duration-200 shadow-sm">
+                                <div class="text-gray-700">@auth {{ Auth::user()->name }} @else Connexion / Compte @endauth</div>
+                                <div class="ml-2">
+                                    <svg class="fill-current h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                                     </svg>
                                 </div>
@@ -81,7 +88,7 @@
                                 </x-dropdown-link>
 
                                 {{-- Profile Link (using defined route name) --}}
-                                <x-dropdown-link :href="route('profile.edit')">
+                                <x-dropdown-link :href="route('customer.profile.edit')">
                                     {{ __('Profile') }}
                                 </x-dropdown-link>
 
@@ -108,7 +115,7 @@
             </div>
 
             <div class="-mr-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                <button @click="open = ! open" class="inline-flex items-center justify-center p-3 rounded-lg text-gray-600 hover:text-blue-primary hover:bg-blue-50 focus:outline-none focus:bg-blue-50 focus:text-blue-primary transition-all duration-200 border border-gray-200">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -118,40 +125,43 @@
         </div>
     </div>
 
-    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-dark-navy/95 backdrop-blur-sm shadow-xl absolute w-full pb-3">
-        <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">
+    <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden bg-white shadow-2xl border-t border-gray-100 absolute w-full pb-4">
+        <div class="pt-4 pb-4 space-y-2 px-4">
+            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                 {{ __('Accueil') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('booking')" :active="request()->routeIs('booking')">
+            <x-responsive-nav-link :href="route('booking')" :active="request()->routeIs('booking')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                 {{ __('Réserver') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('services.index')" :active="request()->routeIs('services.index')">
+            <x-responsive-nav-link :href="route('services.index')" :active="request()->routeIs('services.index')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                 {{ __('Services') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('airports.index')" :active="request()->routeIs('airports.index')">
+            <x-responsive-nav-link :href="route('airports.index')" :active="request()->routeIs('airports.index')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                 {{ __('Aéroports') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('contact')" :active="request()->routeIs('contact')">
+            <x-responsive-nav-link :href="route('faq')" :active="request()->routeIs('faq')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
+                {{ __('FAQ') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('contact')" :active="request()->routeIs('contact')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                 {{ __('Contact') }}
             </x-responsive-nav-link>
         </div>
 
-        <div class="pt-4 pb-1 border-t border-gray-200">
+        <div class="pt-4 pb-3 border-t border-gray-200 bg-gray-50">
             @auth
-                <div class="px-4">
-                    <div class="font-medium text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-500">{{ Auth::user()->email }}</div>
+                <div class="px-4 py-3">
+                    <div class="font-semibold text-base text-gray-800">{{ Auth::user()->name }}</div>
+                    <div class="font-medium text-sm text-gray-600">{{ Auth::user()->email }}</div>
                 </div>
 
-                <div class="mt-3 space-y-1">
+                <div class="mt-2 space-y-1 px-4">
                     {{-- Customer Dashboard Link --}}
-                    <x-responsive-nav-link :href="route('customer.dashboard')">
+                    <x-responsive-nav-link :href="route('customer.dashboard')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                         {{ __('Tableau de bord') }}
                     </x-responsive-nav-link>
 
                     {{-- Profile Link --}}
-                    <x-responsive-nav-link :href="route('profile.edit')">
+                    <x-responsive-nav-link :href="route('customer.profile.edit')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                         {{ __('Profile') }}
                     </x-responsive-nav-link>
 
@@ -160,17 +170,18 @@
 
                         <x-responsive-nav-link :href="route('logout')"
                                 onclick="event.preventDefault();
-                                            this.closest('form').submit();">
-                            {{ __('Log Out') }}
+                                            this.closest('form').submit();"
+                                class="text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200">
+                            {{ __('Déconnexion') }}
                         </x-responsive-nav-link>
                     </form>
                 </div>
             @else
-                <div class="mt-3 space-y-1">
-                    <x-responsive-nav-link :href="route('login')">
+                <div class="mt-2 space-y-1 px-4">
+                    <x-responsive-nav-link :href="route('login')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                         {{ __('Connexion') }}
                     </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('register')">
+                    <x-responsive-nav-link :href="route('register')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                         {{ __('Inscription') }}
                     </x-responsive-nav-link>
                 </div>

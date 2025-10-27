@@ -15,9 +15,9 @@
 
         {{-- Stats Cards --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <x-stat title="Réservations totales" :value="$user->customer->total_bookings ?? 0" description="Depuis votre inscription" />
-            <x-stat title="Réservations actives" :value="$user->bookings()->whereIn('status', ['new', 'confirmed'])->count()" description="En cours" />
-            <x-stat title="Dernière réservation" :value="$user->customer->last_booking_at ? $user->customer->last_booking_at->format('d/m/Y') : 'Aucune'" description="Date" />
+            <x-stat title="Réservations totales" :value="$stats['total_bookings'] ?? 0" description="Depuis votre inscription" />
+            <x-stat title="Réservations actives" :value="$upcomingBookings->whereIn('status', ['new', 'confirmed'])->count()" description="En cours" />
+            <x-stat title="Dernière réservation" :value="$stats['last_booking'] ? $stats['last_booking']->format('d/m/Y') : 'Aucune'" description="Date" />
         </div>
 
         {{-- Quick Actions --}}
@@ -42,9 +42,9 @@
                 <h2 class="text-xl font-semibold text-gray-900">Réservations récentes</h2>
             </div>
 
-            @if($bookings->count() > 0)
+            @if($recentBookings->count() > 0)
                 <div class="divide-y divide-gray-200">
-                    @foreach($bookings as $booking)
+                    @foreach($recentBookings as $booking)
                         <div class="p-6 hover:bg-gray-50">
                             <div class="flex items-center justify-between">
                                 <div class="flex-1">
@@ -104,7 +104,7 @@
 
         {{-- Upcoming Bookings Alert --}}
         @php
-            $upcoming = $user->bookings()
+            $upcoming = $upcomingBookings
                 ->where('status', 'confirmed')
                 ->where('pickup_datetime', '>', now())
                 ->where('pickup_datetime', '<=', now()->addHours(24))
