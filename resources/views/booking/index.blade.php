@@ -1321,11 +1321,11 @@ button:hover::before {
                                     Date et heure *
                                 </label>
                                 <div class="relative">
-                                    <input id="pickup_datetime" name="pickup_datetime" type="datetime-local"
-                                        class="form-input-modern w-full pl-12"
-                                        :value="old('pickup_datetime')"
-                                        min="{{ now()->addHour()->format('Y-m-d\TH:i') }}"
-                                        required />
+                                <input id="pickup_datetime" name="pickup_time" type="datetime-local"
+                                    class="form-input-modern w-full pl-12"
+                                    :value="old('pickup_time')"
+                                    min="{{ now()->addHour()->format('Y-m-d\TH:i') }}"
+                                    required />
                                     <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
                                         <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -1686,8 +1686,8 @@ button:hover::before {
                             <div class="space-y-4">
                                 <label class="flex items-center p-4 border-2 border-gray-200 rounded-xl hover:border-blue-300 cursor-pointer transition-all duration-300 hover:shadow-md">
                                     <div class="flex-shrink-0">
-                                        <input type="checkbox" name="child_seat" value="1" {{ old('child_seat') ? 'checked' : '' }}
-                                            class="w-5 h-5 rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-600 focus:ring-blue-600">
+                                <input type="checkbox" name="child_seat_count" value="1" {{ old('child_seat_count') ? 'checked' : '' }}
+                                    class="w-5 h-5 rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-600 focus:ring-blue-600">
                                     </div>
                                     <div class="ml-4 flex items-center justify-between w-full">
                                         <div>
