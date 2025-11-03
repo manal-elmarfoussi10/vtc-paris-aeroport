@@ -2131,9 +2131,9 @@ function updateRoute() {
 }
 
 function updatePrice() {
-    const vehicleSelect = document.getElementById('vehicle_class');
-    const vehicleClass = vehicleSelect.value;
-    const childSeat = document.querySelector('input[name="child_seat"]').checked;
+    const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
+    const vehicleClass = selectedVehicle ? selectedVehicle.value : null;
+    const childSeat = document.querySelector('input[name="child_seat_count"]').checked;
     const meetGreet = document.querySelector('input[name="meet_greet"]').checked;
 
     let basePrice = 0;
@@ -2173,10 +2173,24 @@ function updatePrice() {
     if (meetGreet) total += 10;
 
     const priceElement = document.getElementById('price-estimate');
-    if (total > 0) {
-        priceElement.textContent = `${Math.round(total)}€`;
-    } else {
-        priceElement.textContent = 'À calculer';
+    if (priceElement) {
+        if (total > 0) {
+            priceElement.textContent = `${Math.round(total)}€`;
+        } else {
+            priceElement.textContent = 'À calculer';
+        }
+    }
+
+    // Update distance and duration displays
+    const distanceDisplay = document.getElementById('distance-display');
+    const durationDisplay = document.getElementById('duration-display');
+
+    if (distanceDisplay) {
+        distanceDisplay.textContent = currentDistance > 0 ? `${currentDistance.toFixed(1)} km` : 'À calculer';
+    }
+
+    if (durationDisplay) {
+        durationDisplay.textContent = currentDuration > 0 ? `${Math.round(currentDuration)} min` : 'À calculer';
     }
 }
 
