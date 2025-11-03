@@ -35,8 +35,7 @@
             <div class="hidden md:flex md:w-64 md:flex-col">
                 <div class="flex flex-col flex-grow pt-5 bg-dark-navy overflow-y-auto">
                     <div class="flex items-center flex-shrink-0 px-4 mb-8">
-                        <x-application-logo class="h-8 w-auto" />
-                        <span class="ml-2 text-white font-semibold">Administration</span>
+                        <span class="ml-2 text-white font-semibold">VTC Administration</span>
                     </div>
 
                     <div class="mt-5 flex-1 flex flex-col">

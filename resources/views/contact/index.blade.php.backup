@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 {{-- Contact Methods Section --}}
-<section class="py-6 bg-gray-50">
+<section class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-16">
             <h2 class="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
@@ -179,8 +179,8 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 </section>
 
-{{-- Contact Methods Section 2 --}}
-<section class="pt-1 pb-20 sm:pt-10 bg-gray-50">
+{{-- Contact Methods Section --}}
+<section class="py-20 bg-gray-50">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
             {{-- Phone Contact --}}
@@ -239,8 +239,15 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
 
         {{-- Contact Form Section --}}
-        <div class="bg-white rounded-2xl shadow-xl p-8 lg:p-12" style="margin-top: -2rem;">
-
+        <div class="bg-white rounded-2xl shadow-xl p-8 lg:p-12">
+                {{-- Submit --}}
+                <div class="text-center">
+                    <x-primary-button class="px-12 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                        Envoyer le message
+                    </x-primary-button>
+                </div>
+            </form>
+=======
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-900 mb-4">Formulaire de Contact</h2>
                 <p class="text-lg text-gray-600">Remplissez ce formulaire et nous vous répondrons dans les plus brefs délais</p>
@@ -259,8 +266,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 @endif
             </div>
-
-            
+=======
+                {{-- Submit --}}
+                <div class="text-center">
+                    <x-primary-button class="px-12 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
+                        Envoyer le message
+                    </x-primary-button>
+                </div>
             </form>
 
             <form method="POST" action="{{ route('contact.send') }}" class="max-w-4xl mx-auto">

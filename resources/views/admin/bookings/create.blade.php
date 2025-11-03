@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Modifier la Réservation #' . $booking->id . ' - Admin')
+@section('title', 'Créer une Réservation - Admin')
 
 @section('content')
 <div class="py-12">
@@ -9,21 +9,20 @@
             <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
                 <div class="flex items-center">
                     <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                     </svg>
                     <h1 class="ml-2 text-2xl font-medium text-gray-900">
-                        Modifier la Réservation #{{ $booking->id }}
+                        Créer une Nouvelle Réservation
                     </h1>
                 </div>
 
                 <p class="mt-6 text-gray-500 leading-relaxed">
-                    Modifiez les détails de cette réservation. Tous les champs marqués d'un astérisque (*) sont obligatoires.
+                    Créez une nouvelle réservation pour un client. Tous les champs marqués d'un astérisque (*) sont obligatoires.
                 </p>
             </div>
 
-            <form method="POST" action="{{ route('admin.bookings.update', $booking) }}" class="bg-white">
+            <form method="POST" action="{{ route('admin.bookings.store') }}" class="bg-white">
                 @csrf
-                @method('PATCH')
 
                 <div class="p-6 lg:p-8">
                     {{-- Success Message --}}
@@ -47,7 +46,7 @@
                             <select id="user_id" name="user_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
                                 <option value="">Sélectionner un client existant</option>
                                 @foreach($customers as $customer)
-                                    <option value="{{ $customer->id }}" {{ old('user_id', $booking->user_id) == $customer->id ? 'selected' : '' }}>
+                                    <option value="{{ $customer->id }}" {{ old('user_id') == $customer->id ? 'selected' : '' }}>
                                         {{ $customer->name }} ({{ $customer->email }})
                                     </option>
                                 @endforeach
@@ -60,7 +59,7 @@
                             <x-input-label for="customer_name" value="Nom du client *" />
                             <x-text-input id="customer_name" name="customer_name" type="text"
                                 class="mt-1 block w-full"
-                                :value="old('customer_name', $booking->customer_name)"
+                                :value="old('customer_name')"
                                 required />
                             <x-input-error :messages="$errors->get('customer_name')" class="mt-2" />
                         </div>
@@ -70,7 +69,7 @@
                             <x-input-label for="customer_email" value="Email du client *" />
                             <x-text-input id="customer_email" name="customer_email" type="email"
                                 class="mt-1 block w-full"
-                                :value="old('customer_email', $booking->customer_email)"
+                                :value="old('customer_email')"
                                 required />
                             <x-input-error :messages="$errors->get('customer_email')" class="mt-2" />
                         </div>
@@ -80,7 +79,7 @@
                             <x-input-label for="customer_phone" value="Téléphone du client" />
                             <x-text-input id="customer_phone" name="customer_phone" type="tel"
                                 class="mt-1 block w-full"
-                                :value="old('customer_phone', $booking->customer_phone)"
+                                :value="old('customer_phone')"
                                 placeholder="+33 6 XX XX XX XX" />
                             <x-input-error :messages="$errors->get('customer_phone')" class="mt-2" />
                         </div>
@@ -90,7 +89,7 @@
                             <x-input-label for="pickup_address" value="Adresse de prise en charge *" />
                             <x-text-input id="pickup_address" name="pickup_address" type="text"
                                 class="mt-1 block w-full"
-                                :value="old('pickup_address', $booking->pickup_address)"
+                                :value="old('pickup_address')"
                                 required />
                             <x-input-error :messages="$errors->get('pickup_address')" class="mt-2" />
                         </div>
@@ -100,7 +99,7 @@
                             <x-input-label for="dropoff_address" value="Adresse de destination *" />
                             <x-text-input id="dropoff_address" name="dropoff_address" type="text"
                                 class="mt-1 block w-full"
-                                :value="old('dropoff_address', $booking->dropoff_address)"
+                                :value="old('dropoff_address')"
                                 required />
                             <x-input-error :messages="$errors->get('dropoff_address')" class="mt-2" />
                         </div>
@@ -110,7 +109,7 @@
                             <x-input-label for="pickup_time" value="Date et heure de prise en charge *" />
                             <x-text-input id="pickup_time" name="pickup_time" type="datetime-local"
                                 class="mt-1 block w-full"
-                                :value="old('pickup_time', $booking->pickup_time->format('Y-m-d\TH:i'))"
+                                :value="old('pickup_time')"
                                 required />
                             <x-input-error :messages="$errors->get('pickup_time')" class="mt-2" />
                         </div>
@@ -120,7 +119,7 @@
                             <x-input-label for="pax" value="Nombre de passagers *" />
                             <x-text-input id="pax" name="pax" type="number" min="1" max="8"
                                 class="mt-1 block w-full"
-                                :value="old('pax', $booking->pax)"
+                                :value="old('pax', 1)"
                                 required />
                             <x-input-error :messages="$errors->get('pax')" class="mt-2" />
                         </div>
@@ -130,7 +129,7 @@
                             <x-input-label for="luggage" value="Nombre de bagages *" />
                             <x-text-input id="luggage" name="luggage" type="number" min="0" max="8"
                                 class="mt-1 block w-full"
-                                :value="old('luggage', $booking->luggage)"
+                                :value="old('luggage', 0)"
                                 required />
                             <x-input-error :messages="$errors->get('luggage')" class="mt-2" />
                         </div>
@@ -141,7 +140,7 @@
                             <select id="vehicle_id" name="vehicle_id" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
                                 <option value="">Sélectionner un véhicule</option>
                                 @foreach($vehicles as $vehicle)
-                                    <option value="{{ $vehicle->id }}" {{ old('vehicle_id', $booking->vehicle_id) == $vehicle->id ? 'selected' : '' }}>
+                                    <option value="{{ $vehicle->id }}" {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
                                         {{ $vehicle->name }} ({{ $vehicle->class_label }} - {{ $vehicle->pax }} places)
                                     </option>
                                 @endforeach
@@ -154,7 +153,7 @@
                             <x-input-label for="child_seat_count" value="Sièges enfant" />
                             <x-text-input id="child_seat_count" name="child_seat_count" type="number" min="0" max="4"
                                 class="mt-1 block w-full"
-                                :value="old('child_seat_count', $booking->child_seat_count)" />
+                                :value="old('child_seat_count', 0)" />
                             <x-input-error :messages="$errors->get('child_seat_count')" class="mt-2" />
                         </div>
 
@@ -163,7 +162,7 @@
                             <x-input-label for="flight_number" value="Numéro de vol" />
                             <x-text-input id="flight_number" name="flight_number" type="text"
                                 class="mt-1 block w-full"
-                                :value="old('flight_number', $booking->flight_number)"
+                                :value="old('flight_number')"
                                 placeholder="AF 1234" />
                             <x-input-error :messages="$errors->get('flight_number')" class="mt-2" />
                         </div>
@@ -173,7 +172,7 @@
                             <x-input-label for="price" value="Prix (€)" />
                             <x-text-input id="price" name="price" type="number" step="0.01" min="0"
                                 class="mt-1 block w-full"
-                                :value="old('price', $booking->price)"
+                                :value="old('price')"
                                 placeholder="0.00" />
                             <x-input-error :messages="$errors->get('price')" class="mt-2" />
                         </div>
@@ -182,10 +181,10 @@
                         <div>
                             <x-input-label for="status" value="Statut *" />
                             <select id="status" name="status" class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm" required>
-                                <option value="new" {{ old('status', $booking->status) == 'new' ? 'selected' : '' }}>Nouveau</option>
-                                <option value="confirmed" {{ old('status', $booking->status) == 'confirmed' ? 'selected' : '' }}>Confirmé</option>
-                                <option value="completed" {{ old('status', $booking->status) == 'completed' ? 'selected' : '' }}>Terminé</option>
-                                <option value="cancelled" {{ old('status', $booking->status) == 'cancelled' ? 'selected' : '' }}>Annulé</option>
+                                <option value="new" {{ old('status', 'new') == 'new' ? 'selected' : '' }}>Nouveau</option>
+                                <option value="confirmed" {{ old('status') == 'confirmed' ? 'selected' : '' }}>Confirmé</option>
+                                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Terminé</option>
+                                <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Annulé</option>
                             </select>
                             <x-input-error :messages="$errors->get('status')" class="mt-2" />
                         </div>
@@ -194,7 +193,7 @@
                         <div class="flex items-center">
                             <input id="meet_greet" name="meet_greet" type="checkbox" value="1"
                                 class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500"
-                                {{ old('meet_greet', $booking->meet_greet) ? 'checked' : '' }}>
+                                {{ old('meet_greet') ? 'checked' : '' }}>
                             <label for="meet_greet" class="ml-2 text-sm text-gray-900">
                                 Accueil à l'aéroport (Meet & Greet)
                             </label>
@@ -206,18 +205,18 @@
                         <x-input-label for="notes" value="Notes supplémentaires" />
                         <textarea id="notes" name="notes" rows="4"
                             class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
-                            placeholder="Informations supplémentaires...">{{ old('notes', $booking->notes) }}</textarea>
+                            placeholder="Informations supplémentaires...">{{ old('notes') }}</textarea>
                         <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                     </div>
                 </div>
 
                 <div class="flex items-center justify-end px-6 lg:px-8 py-4 bg-gray-50 border-t border-gray-200">
-                    <a href="{{ route('admin.bookings.show', $booking) }}" class="mr-4 px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
+                    <a href="{{ route('admin.bookings.index') }}" class="mr-4 px-4 py-2 bg-gray-300 border border-transparent rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150">
                         Annuler
                     </a>
 
                     <x-primary-button class="px-6 py-2">
-                        Mettre à jour la Réservation
+                        Créer la Réservation
                     </x-primary-button>
                 </div>
             </form>

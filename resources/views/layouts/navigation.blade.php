@@ -65,53 +65,13 @@
                     Calculer mon tarif
                 </a>
 
-                <div class="relative">
-                    <x-dropdown align="right" width="48">
-                        {{-- Dropdown Trigger (Authentication Links) --}}
-                        <x-slot name="trigger">
-                            <button class="inline-flex items-center px-4 py-2 border border-gray-200 text-sm leading-4 font-medium rounded-lg {{ $nav_text_class }} bg-gray-50 hover:bg-gray-100 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent transition-all duration-200 shadow-sm">
-                                <div class="text-gray-700">@auth {{ Auth::user()->name }} @else Connexion / Compte @endauth</div>
-                                <div class="ml-2">
-                                    <svg class="fill-current h-4 w-4 text-gray-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                            </button>
-                        </x-slot>
-
-                        {{-- Dropdown Content --}}
-                        <x-slot name="content">
-                            @auth
-                                {{-- Customer Dashboard Link (using defined route name) --}}
-                                <x-dropdown-link :href="route('customer.dashboard')">
-                                    {{ __('Tableau de bord') }}
-                                </x-dropdown-link>
-
-                                {{-- Profile Link (using defined route name) --}}
-                                <x-dropdown-link :href="route('customer.profile.edit')">
-                                    {{ __('Profile') }}
-                                </x-dropdown-link>
-
-                                <form method="POST" action="{{ route('logout') }}">
-                                    @csrf
-                                    <x-dropdown-link :href="route('logout')"
-                                            onclick="event.preventDefault();
-                                                        this.closest('form').submit();">
-                                        {{ __('Déconnexion') }}
-                                    </x-dropdown-link>
-                                </form>
-                            @else
-                                {{-- Guest Links --}}
-                                <x-dropdown-link :href="route('login')">
-                                    {{ __('Connexion') }}
-                                </x-dropdown-link>
-                                <x-dropdown-link :href="route('register')">
-                                    {{ __('Inscription') }}
-                                </x-dropdown-link>
-                            @endauth
-                        </x-slot>
-                    </x-dropdown>
-                </div>
+                {{-- Contact Us Button --}}
+                <a href="{{ route('contact') }}" class="inline-flex items-center px-4 py-2 border border-gray-200 text-sm leading-4 font-medium rounded-lg {{ $nav_text_class }} bg-gray-50 hover:bg-gray-100 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent transition-all duration-200 shadow-sm">
+                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    Nous contacter
+                </a>
             </div>
 
             <div class="-mr-2 flex items-center sm:hidden">
@@ -148,44 +108,11 @@
         </div>
 
         <div class="pt-4 pb-3 border-t border-gray-200 bg-gray-50">
-            @auth
-                <div class="px-4 py-3">
-                    <div class="font-semibold text-base text-gray-800">{{ Auth::user()->name }}</div>
-                    <div class="font-medium text-sm text-gray-600">{{ Auth::user()->email }}</div>
-                </div>
-
-                <div class="mt-2 space-y-1 px-4">
-                    {{-- Customer Dashboard Link --}}
-                    <x-responsive-nav-link :href="route('customer.dashboard')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
-                        {{ __('Tableau de bord') }}
-                    </x-responsive-nav-link>
-
-                    {{-- Profile Link --}}
-                    <x-responsive-nav-link :href="route('customer.profile.edit')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
-                        {{ __('Profile') }}
-                    </x-responsive-nav-link>
-
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-
-                        <x-responsive-nav-link :href="route('logout')"
-                                onclick="event.preventDefault();
-                                            this.closest('form').submit();"
-                                class="text-red-600 hover:text-red-700 hover:bg-red-50 transition-colors duration-200">
-                            {{ __('Déconnexion') }}
-                        </x-responsive-nav-link>
-                    </form>
-                </div>
-            @else
-                <div class="mt-2 space-y-1 px-4">
-                    <x-responsive-nav-link :href="route('login')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
-                        {{ __('Connexion') }}
-                    </x-responsive-nav-link>
-                    <x-responsive-nav-link :href="route('register')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
-                        {{ __('Inscription') }}
-                    </x-responsive-nav-link>
-                </div>
-            @endauth
+            <div class="mt-2 space-y-1 px-4">
+                <x-responsive-nav-link :href="route('contact')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
+                    {{ __('Nous contacter') }}
+                </x-responsive-nav-link>
+            </div>
         </div>
     </div>
 </nav>

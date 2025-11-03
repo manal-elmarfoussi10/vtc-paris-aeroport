@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\BookingAdminController;
 use App\Http\Controllers\Admin\CustomerAdminController;
 use App\Http\Controllers\Admin\VehicleAdminController;
 use App\Http\Controllers\Admin\SettingAdminController;
+use App\Http\Controllers\Admin\ContactMessageAdminController;
 use App\Http\Controllers\Customer\CustomerDashboardController;
 
 /*

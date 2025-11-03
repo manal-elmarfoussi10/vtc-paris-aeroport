@@ -116,8 +116,21 @@ class BookingController extends Controller
 
             DB::commit();
 
-            // Send confirmation email (placeholder for now)
-            $this->sendBookingConfirmation($booking);
+            // Send confirmation email
+            try {
+                Mail::to($booking->customer_email)->send(new BookingConfirmation($booking));
+                Log::info('Booking confirmation email sent', [
+                    'booking_id' => $booking->id,
+                    'email' => $booking->customer_email,
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Failed to send booking confirmation email', [
+                    'booking_id' => $booking->id,
+                    'email' => $booking->customer_email,
+                    'error' => $e->getMessage(),
+                ]);
+                // Don't fail the booking if email fails
+            }
 
             // Log the booking
             Log::info('New booking created', [
@@ -127,7 +140,7 @@ class BookingController extends Controller
             ]);
 
             return redirect()->route('booking.confirm', $booking)
-                           ->with('success', 'Votre réservation a été créée avec succès !');
+                           ->with('success', 'Votre réservation a été créée avec succès ! Un email de confirmation vous a été envoyé.');
 
         } catch (\Exception $e) {
             DB::rollBack();
