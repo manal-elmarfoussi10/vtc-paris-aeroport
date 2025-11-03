@@ -230,6 +230,10 @@
     transition: all 0.3s ease;
 }
 
+#map {
+    min-height: 320px;
+}
+
 .map-container:hover {
     box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2), 0 0 20px rgba(59, 130, 246, 0.1);
     border-color: #3b82f6;
@@ -1638,7 +1642,7 @@ button:hover::before {
                             </label>
                             <div class="grid grid-cols-1 gap-4">
                                 @foreach($vehicles as $vehicle)
-                                <div class="service-card p-5 cursor-pointer transition-all duration-300" onclick="selectVehicle('{{ $vehicle->class }}')">
+                                <div class="service-card p-5 cursor-pointer transition-all duration-300" onclick="selectVehicle('{{ $vehicle->class }}', this)">
                                     <div class="flex items-center justify-between">
                                         <div class="flex items-center">
                                             <div class="w-14 h-14 bg-gradient-to-r from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-5 shadow-sm">
@@ -1897,7 +1901,10 @@ function updateBookingSummary() {
     // Update route info
     document.getElementById('summary-pickup').textContent = document.getElementById('pickup_address').value;
     document.getElementById('summary-dropoff').textContent = document.getElementById('dropoff_address').value;
-    document.getElementById('summary-datetime').textContent = new Date(document.getElementById('pickup_datetime').value).toLocaleString('fr-FR');
+    const dtVal = document.getElementById('pickup_datetime').value;
+    document.getElementById('summary-datetime').textContent = dtVal
+      ? new Date(dtVal).toLocaleString('fr-FR')
+      : 'À définir';
     document.getElementById('summary-passengers').textContent = document.getElementById('pax').value;
     document.getElementById('summary-luggage').textContent = document.getElementById('luggage').value;
 
@@ -1912,8 +1919,10 @@ function updateBookingSummary() {
     }
 
     // Update extras
-    const childSeat = document.querySelector('input[name="child_seat"]').checked;
-    const meetGreet = document.querySelector('input[name="meet_greet"]').checked;
+    const childSeatEl = document.querySelector('input[name="child_seat_count"]');
+    const meetGreetEl = document.querySelector('input[name="meet_greet"]');
+    const childSeat = !!(childSeatEl && childSeatEl.checked);
+    const meetGreet = !!(meetGreetEl && meetGreetEl.checked);
     const extrasList = document.getElementById('summary-extras');
     extrasList.innerHTML = '';
 
@@ -1944,17 +1953,17 @@ function updateBookingSummary() {
     }
 }
 
-function selectVehicle(vehicleClass) {
+function selectVehicle(vehicleClass, el) {
     // Remove selected class from all cards
     document.querySelectorAll('.service-card').forEach(card => {
         card.classList.remove('selected');
     });
 
     // Add selected class to clicked card
-    event.currentTarget.classList.add('selected');
+    el.classList.add('selected');
 
     // Check the radio button
-    const radio = event.currentTarget.querySelector('.vehicle-radio');
+    const radio = el.querySelector('.vehicle-radio');
     radio.checked = true;
 
     // Update price
@@ -2133,8 +2142,10 @@ function updateRoute() {
 function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
     const vehicleClass = selectedVehicle ? selectedVehicle.value : null;
-    const childSeat = document.querySelector('input[name="child_seat_count"]').checked;
-    const meetGreet = document.querySelector('input[name="meet_greet"]').checked;
+    const childSeat1 = document.querySelector('input[name="child_seat_count"]');
+    const meetGreet1 = document.querySelector('input[name="meet_greet"]');
+    const childSeat = !!(childSeat1 && childSeat1.checked);
+    const meetGreet = !!(meetGreet1 && meetGreet1.checked);
 
     let basePrice = 0;
     let perKm = 0;
