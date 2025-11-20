@@ -1184,7 +1184,7 @@ button:hover::before {
 }
 </style>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAOZ_TFa0r2-Yf_K9C7o3rKeBA0bOrBnhE&libraries=places,geometry&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places,geometry&callback=initMap"></script>
 @endsection
 
 @section('content')
