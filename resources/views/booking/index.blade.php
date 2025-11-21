@@ -34,6 +34,9 @@
         transform: scale(1.05);
     }
 }
+#map {
+    min-height: 320px;
+}
 
 @keyframes slideInLeft {
     from {
@@ -553,11 +556,12 @@ button:active {
 /* (media queries and other styles you had – keep them the same) */
 /* ... I shortened here to keep the answer readable, but in your file keep ALL the CSS you pasted before ... */
 
-</style>
+{{-- Google Maps JS with Places --}}
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"
+    async defer></script>
 
-<script defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"></script>
 @endsection
-
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pt-20 pb-12">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -610,7 +614,7 @@ button:active {
         <form method="POST" action="{{ route('booking.store') }}" class="space-y-8 perspective-1000 transform-3d bg-dynamic-gradient" id="booking-form">
             @csrf
             <x-auth-session-status class="mb-4" :status="session('status')" />
-        
+
             {{-- STEP 1 – TRAJET --}}
             <div id="step-1-content" class="step-transition">
                 <div class="booking-card p-6 md:p-8 mb-8">
@@ -620,7 +624,7 @@ button:active {
                         </span>
                         Informations sur votre trajet
                     </h2>
-        
+
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {{-- Left side: form fields --}}
                         <div class="space-y-5">
@@ -638,11 +642,15 @@ button:active {
                                     value="{{ old('pickup_address') }}"
                                     required
                                 >
+                                {{-- hidden lat/lng --}}
+                                <input type="hidden" id="pickup_lat" name="pickup_lat" value="{{ old('pickup_lat') }}">
+                                <input type="hidden" id="pickup_lng" name="pickup_lng" value="{{ old('pickup_lng') }}">
+
                                 @error('pickup_address')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
-        
+
                             {{-- Dropoff --}}
                             <div>
                                 <label for="dropoff_address" class="block text-sm font-medium text-gray-700 mb-1">
@@ -657,30 +665,34 @@ button:active {
                                     value="{{ old('dropoff_address') }}"
                                     required
                                 >
+                                {{-- hidden lat/lng --}}
+                                <input type="hidden" id="dropoff_lat" name="dropoff_lat" value="{{ old('dropoff_lat') }}">
+                                <input type="hidden" id="dropoff_lng" name="dropoff_lng" value="{{ old('dropoff_lng') }}">
+
                                 @error('dropoff_address')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
-        
-                            {{-- Date & time --}}
+
+                            {{-- Date & time (name must match controller: pickup_time) --}}
                             <div>
-                                <label for="pickup_datetime" class="block text-sm font-medium text-gray-700 mb-1">
+                                <label for="pickup_time" class="block text-sm font-medium text-gray-700 mb-1">
                                     Date & heure de prise en charge *
                                 </label>
                                 <input
                                     type="datetime-local"
-                                    id="pickup_datetime"
-                                    name="pickup_datetime"
+                                    id="pickup_time"
+                                    name="pickup_time"
                                     class="w-full form-input-modern"
-                                    value="{{ old('pickup_datetime') }}"
+                                    value="{{ old('pickup_time') }}"
                                     required
                                 >
-                                @error('pickup_datetime')
+                                @error('pickup_time')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
-        
-                            {{-- Passengers --}}
+
+                            {{-- Passagers / bagages --}}
                             <div class="grid grid-cols-2 gap-4">
                                 <div>
                                     <label for="pax" class="block text-sm font-medium text-gray-700 mb-1">
@@ -696,7 +708,7 @@ button:active {
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-        
+
                                 <div>
                                     <label for="luggage" class="block text-sm font-medium text-gray-700 mb-1">
                                         Bagages *
@@ -713,13 +725,13 @@ button:active {
                                 </div>
                             </div>
                         </div>
-        
+
                         {{-- Right side: map + distance --}}
                         <div class="space-y-5">
                             <div class="map-container loading">
                                 <div id="map"></div>
                             </div>
-        
+
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="price-display relative overflow-hidden">
                                     <p class="text-sm opacity-80">Distance estimée</p>
@@ -732,7 +744,7 @@ button:active {
                             </div>
                         </div>
                     </div>
-        
+
                     {{-- Step 1 actions --}}
                     <div class="mt-8 flex justify-end">
                         <button
@@ -748,7 +760,7 @@ button:active {
                     </div>
                 </div>
             </div>
-        
+
             {{-- STEP 2 – DÉTAILS & VÉHICULE --}}
             <div id="step-2-content" class="step-transition hidden">
                 <div class="booking-card p-6 md:p-8 mb-8">
@@ -758,7 +770,7 @@ button:active {
                         </span>
                         Choisissez votre véhicule et options
                     </h2>
-        
+
                     <div class="space-y-8">
                         {{-- Vehicle list --}}
                         <div>
@@ -808,12 +820,12 @@ button:active {
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-        
-                        {{-- Options --}}
+
+                        {{-- Options / coordonnées / prix (identique à ton code) --}}
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="space-y-2">
                                 <h3 class="text-lg font-semibold">Options supplémentaires</h3>
-        
+
                                 <label class="flex items-center space-x-3">
                                     <input
                                         type="checkbox"
@@ -825,7 +837,7 @@ button:active {
                                     >
                                     <span class="text-sm text-gray-700">Siège enfant (+15€)</span>
                                 </label>
-        
+
                                 <label class="flex items-center space-x-3">
                                     <input
                                         type="checkbox"
@@ -838,11 +850,10 @@ button:active {
                                     <span class="text-sm text-gray-700">Accueil à l'aéroport (+10€)</span>
                                 </label>
                             </div>
-        
-                            {{-- Customer --}}
+
                             <div class="space-y-3">
                                 <h3 class="text-lg font-semibold">Vos coordonnées</h3>
-        
+
                                 <div>
                                     <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1">
                                         Nom & prénom *
@@ -860,7 +871,7 @@ button:active {
                                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-        
+
                                 <div>
                                     <label for="customer_phone" class="block text-sm font-medium text-gray-700 mb-1">
                                         Téléphone
@@ -875,8 +886,7 @@ button:active {
                                     >
                                 </div>
                             </div>
-        
-                            {{-- Price --}}
+
                             <div class="space-y-3">
                                 <h3 class="text-lg font-semibold">Prix estimé</h3>
                                 <div class="price-display">
@@ -890,7 +900,7 @@ button:active {
                                 </div>
                             </div>
                         </div>
-        
+
                         {{-- Notes --}}
                         <div>
                             <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
@@ -905,7 +915,7 @@ button:active {
                             >{{ old('notes') }}</textarea>
                         </div>
                     </div>
-        
+
                     {{-- Step 2 actions --}}
                     <div class="mt-8 flex justify-between">
                         <button type="button" onclick="prevStep(1)" class="inline-flex items-center px-5 py-3 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 ripple">
@@ -914,7 +924,7 @@ button:active {
                             </svg>
                             Retour
                         </button>
-        
+
                         <button type="button" onclick="nextStep(3)" class="inline-flex items-center px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ripple">
                             Continuer
                             <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -924,7 +934,7 @@ button:active {
                     </div>
                 </div>
             </div>
-        
+
             {{-- STEP 3 – CONFIRMATION --}}
             <div id="step-3-content" class="step-transition hidden">
                 <div class="booking-card p-6 md:p-8 mb-8">
@@ -934,7 +944,7 @@ button:active {
                         </span>
                         Vérifiez et confirmez votre réservation
                     </h2>
-        
+
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                         <div class="space-y-3">
                             <h3 class="font-semibold text-gray-800 mb-2">Trajet</h3>
@@ -944,7 +954,7 @@ button:active {
                             <p class="text-sm text-gray-600"><strong>Passagers :</strong> <span id="summary-passengers">–</span></p>
                             <p class="text-sm text-gray-600"><strong>Bagages :</strong> <span id="summary-luggage">–</span></p>
                         </div>
-        
+
                         <div class="space-y-3">
                             <h3 class="font-semibold text-gray-800 mb-2">Véhicule & client</h3>
                             <p class="text-sm text-gray-600"><strong>Véhicule :</strong> <span id="summary-vehicle">–</span></p>
@@ -952,12 +962,12 @@ button:active {
                             <p class="text-sm text-gray-600"><strong>Client :</strong> <span id="summary-customer">–</span></p>
                         </div>
                     </div>
-        
+
                     <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 text-sm text-blue-900">
                         En cliquant sur "Confirmer la réservation", vous envoyez votre demande à notre équipe.
                         Nous vous recontacterons pour confirmer le prix final et le chauffeur.
                     </div>
-        
+
                     <div class="flex items-center mb-6">
                         <input
                             type="checkbox"
@@ -969,7 +979,7 @@ button:active {
                             J'ai lu et j'accepte les conditions générales de vente.
                         </label>
                     </div>
-        
+
                     <div class="flex justify-between">
                         <button type="button" onclick="prevStep(2)" class="inline-flex items-center px-5 py-3 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 ripple">
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -977,7 +987,7 @@ button:active {
                             </svg>
                             Retour
                         </button>
-        
+
                         <button
                             type="submit"
                             class="inline-flex items-center px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ripple"
@@ -995,23 +1005,119 @@ button:active {
 
 @section('scripts')
 <script>
+let map;
+let pickupAutocomplete, dropoffAutocomplete;
+let pickupMarker, dropoffMarker;
+let distanceTimeout;
 let currentDistance = 0; // km
 let currentDuration = 0; // minutes
 let currentStep     = 1;
 
-// dummy for Google Maps callback
-function initMap() {}
+/* ========== MAP + AUTOCOMPLETE ========== */
+function initMap() {
+    const mapEl = document.getElementById('map');
+    if (!mapEl) return;
 
-// scroll to top
+    map = new google.maps.Map(mapEl, {
+        center: { lat: 48.8566, lng: 2.3522 }, // Paris
+        zoom: 11,
+    });
+
+    const mapContainer = document.querySelector('.map-container');
+    if (mapContainer) mapContainer.classList.remove('loading');
+
+    const pickupInput  = document.getElementById('pickup_address');
+    const dropoffInput = document.getElementById('dropoff_address');
+
+    const options = {
+        types: ['geocode'],
+        componentRestrictions: { country: 'fr' },
+    };
+
+    if (pickupInput) {
+        pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, options);
+        pickupAutocomplete.addListener('place_changed', () => {
+            const place = pickupAutocomplete.getPlace();
+            handlePlaceSelected(place, 'pickup');
+        });
+    }
+
+    if (dropoffInput) {
+        dropoffAutocomplete = new google.maps.places.Autocomplete(dropoffInput, options);
+        dropoffAutocomplete.addListener('place_changed', () => {
+            const place = dropoffAutocomplete.getPlace();
+            handlePlaceSelected(place, 'dropoff');
+        });
+    }
+}
+
+function handlePlaceSelected(place, type) {
+    if (!place.geometry || !place.geometry.location) {
+        alert("Adresse introuvable, merci de choisir une suggestion.");
+        return;
+    }
+
+    const lat = place.geometry.location.lat();
+    const lng = place.geometry.location.lng();
+
+    const latInput = document.getElementById(type + '_lat');
+    const lngInput = document.getElementById(type + '_lng');
+    if (latInput) latInput.value = lat;
+    if (lngInput) lngInput.value = lng;
+
+    const position = { lat, lng };
+
+    if (type === 'pickup') {
+        if (!pickupMarker) {
+            pickupMarker = new google.maps.Marker({
+                map,
+                position,
+                label: 'A',
+            });
+        } else {
+            pickupMarker.setPosition(position);
+        }
+    } else {
+        if (!dropoffMarker) {
+            dropoffMarker = new google.maps.Marker({
+                map,
+                position,
+                label: 'B',
+            });
+        } else {
+            dropoffMarker.setPosition(position);
+        }
+    }
+
+    fitMapBounds();
+    scheduleDistanceUpdate();
+}
+
+function fitMapBounds() {
+    if (!map) return;
+
+    const bounds = new google.maps.LatLngBounds();
+    if (pickupMarker) bounds.extend(pickupMarker.getPosition());
+    if (dropoffMarker) bounds.extend(dropoffMarker.getPosition());
+
+    if (!bounds.isEmpty()) {
+        map.fitBounds(bounds);
+    }
+}
+
+/* expose for callback parameter */
+window.initMap = initMap;
+
+/* ========== GENERAL UI HELPERS ========== */
 function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// fill confirmation (step 3)
+/* Confirmation (step 3) */
 function updateBookingSummary() {
     const pickup   = document.getElementById('pickup_address')?.value || '';
     const dropoff  = document.getElementById('dropoff_address')?.value || '';
-    const datetime = document.getElementById('pickup_datetime')?.value || '';
+    const datetime = document.getElementById('pickup_time')?.value || '';
     const pax      = document.getElementById('pax')?.value || '';
     const luggage  = document.getElementById('luggage')?.value || '';
     const customer = document.getElementById('customer_name')?.value || '';
@@ -1027,17 +1133,14 @@ function updateBookingSummary() {
     if (vehicleRadio) {
         const card  = vehicleRadio.closest('.service-card');
         const name  = card.querySelector('h4')?.textContent || 'À définir';
-        const price = card.querySelector('.text-2xl')?.textContent || 'À définir';
-
-        document.getElementById('summary-vehicle').textContent       = name;
-        document.getElementById('summary-vehicle-price').textContent = price;
+        document.getElementById('summary-vehicle').textContent = name;
     }
 
     document.getElementById('summary-total').textContent =
         document.getElementById('price-estimate')?.textContent || 'À calculer';
 }
 
-// step navigation
+/* Step navigation */
 function nextStep(step) {
     if (validateCurrentStep()) {
         showStep(step);
@@ -1071,7 +1174,7 @@ function validateCurrentStep() {
     if (currentStep === 1) {
         const pickup   = document.getElementById('pickup_address').value.trim();
         const dropoff  = document.getElementById('dropoff_address').value.trim();
-        const datetime = document.getElementById('pickup_datetime').value;
+        const datetime = document.getElementById('pickup_time').value;
         const pax      = document.getElementById('pax').value;
 
         if (!pickup || !dropoff || !datetime || !pax) {
@@ -1090,8 +1193,7 @@ function validateCurrentStep() {
     return ok;
 }
 
-// distance API
-let distanceTimeout;
+/* ========== DISTANCE VIA YOUR LARAVEL ROUTE ========== */
 async function updateDistance() {
     const pickup  = document.getElementById('pickup_address').value.trim();
     const dropoff = document.getElementById('dropoff_address').value.trim();
@@ -1135,12 +1237,13 @@ async function updateDistance() {
 
     updatePrice();
 }
+
 function scheduleDistanceUpdate() {
     clearTimeout(distanceTimeout);
-    distanceTimeout = setTimeout(updateDistance, 800);
+    distanceTimeout = setTimeout(updateDistance, 600);
 }
 
-// price
+/* ========== PRICE ========== */
 function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
     const vehicleClass    = selectedVehicle ? selectedVehicle.value : null;
@@ -1168,7 +1271,7 @@ function updatePrice() {
     if (el) el.textContent = total > 0 ? `${Math.round(total)}€` : 'À calculer';
 }
 
-// vehicle select
+/* Vehicle select */
 function selectVehicle(vehicleClass, el) {
     document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
     el.classList.add('selected');
@@ -1177,7 +1280,7 @@ function selectVehicle(vehicleClass, el) {
     updatePrice();
 }
 
-// init
+/* ========== DOM READY ========== */
 document.addEventListener('DOMContentLoaded', () => {
     const pickup  = document.getElementById('pickup_address');
     const dropoff = document.getElementById('dropoff_address');
@@ -1191,5 +1294,11 @@ document.addEventListener('DOMContentLoaded', () => {
         form.addEventListener('input', updatePrice);
     }
 });
+
+/* expose functions used in HTML */
+window.nextStep = nextStep;
+window.prevStep = prevStep;
+window.selectVehicle = selectVehicle;
+window.scrollToTop = scrollToTop;
 </script>
 @endsection
