@@ -273,9 +273,269 @@
     animation: pulse 3s ease-in-out infinite;
 }
 
-/* ... all the rest of your CSS unchanged ... */
-/* (I’m keeping everything you pasted: service-card, fab, media queries, etc.) */
-/* --------- keep everything down to .success-checkmark styles --------- */
+/* Service Cards - Enhanced */
+.service-card {
+    background: white;
+    border: 2px solid #f3f4f6;
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(147, 197, 253, 0.05));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.service-card:hover {
+    border-color: #3b82f6;
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 40px rgba(59, 130, 246, 0.2), 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+.service-card:hover::before {
+    opacity: 1;
+}
+
+.service-card.selected {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    box-shadow: 0 8px 32px rgba(59, 130, 246, 0.25);
+}
+
+.service-card.selected::before {
+    opacity: 1;
+}
+
+/* Floating Action Button - Enhanced */
+.fab {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa);
+    background-size: 200% 200%;
+    color: white;
+    border: none;
+    box-shadow:
+        0 8px 32px rgba(59, 130, 246, 0.4),
+        0 4px 16px rgba(59, 130, 246, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 3s ease-in-out infinite;
+}
+
+.fab::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.fab:hover {
+    transform: scale(1.15) rotate(180deg);
+    box-shadow:
+        0 16px 48px rgba(59, 130, 246, 0.6),
+        0 8px 24px rgba(59, 130, 246, 0.4),
+        0 0 40px rgba(59, 130, 246, 0.3);
+    background-position: right中心;
+}
+
+.fab:hover::before {
+    width: 100px;
+    height: 100px;
+}
+
+.fab:active {
+    transform: scale(0.95) rotate(180deg);
+}
+
+/* Floating Animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Pulse Animation for Active Elements */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 40px rgba(59, 130, 246, 0.6), 0 0 60px rgba(59, 130, 246, 0.4);
+    }
+}
+
+.step-indicator.active {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Advanced Button Animations */
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+    transform: translateY(0px);
+    transition: all 0.1s ease;
+}
+
+/* Ripple Effect */
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+.ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    border-radius: 100%;
+    transform: scale(1, 1) translate(-50%);
+    transform-origin: 50% 50%;
+}
+
+.ripple:focus:not(:active)::after {
+    animation: ripple 1s ease-out;
+}
+
+/* Staggered Animation for Cards */
+.animate-stagger-1 { animation-delay: 0.1s; }
+.animate-stagger-2 { animation-delay: 0.2s; }
+.animate-stagger-3 { animation-delay: 0.3s; }
+.animate-stagger-4 { animation-delay: 0.4s; }
+
+/* 3D Transform Effects */
+.perspective-1000 {
+    perspective: 1000px;
+}
+
+.transform-3d {
+    transform-style: preserve-3d;
+}
+
+/* Advanced Gradient Animations */
+.price-display {
+    background: linear-gradient(135deg, #1e40af, #3b82f6, #60a5fa, #93c5fd, #1e40af);
+    background-size: 400% 400%;
+    animation: gradient-shift 8s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0%, 100% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+/* Interactive Map Enhancements */
+.map-container:hover {
+    transform: scale(1.02);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.2),
+        0 0 30px rgba(59, 130, 246, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Form Element Advanced Effects */
+.form-input-modern:focus {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.15),
+        0 8px 25px rgba(59, 130, 246, 0.1),
+        0 0 40px rgba(59, 130, 246, 0.05);
+}
+
+.form-input-modern:focus::before {
+    left: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(59, 130, 246, 0.2),
+        rgba(147, 197, 253, 0.2),
+        transparent
+    );
+}
+
+/* Loading States with Animation */
+.loading {
+    position: relative;
+    overflow: hidden;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+        transparent,
+        rgba(59, 130, 246, 0.1),
+        rgba(147, 197, 253, 0.1),
+        transparent
+    );
+    animation: shimmer 1.5s infinite;
+}
+
+/* Success Animation */
+@keyframes success-bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
 
 .success-checkmark {
     width: 24px;
@@ -287,8 +547,12 @@
     justify-content: center;
     color: white;
     font-weight: bold;
-    animation: bounceIn 0.6s ease-out;
+    animation: success-bounce 1s ease-out, bounceIn 0.6s ease-out;
 }
+
+/* (media queries and other styles you had – keep them the same) */
+/* ... I shortened here to keep the answer readable, but in your file keep ALL the CSS you pasted before ... */
+
 </style>
 
 <script defer src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"></script>
@@ -347,10 +611,14 @@
             @csrf
             <x-auth-session-status class="mb-4" :status="session('status')" />
 
-            {{-- Step 1: Route Selection --}}
-            {{-- ... ALL YOUR HTML FOR STEP 1, STEP 2, STEP 3 exactly as you pasted ... --}}
-            {{-- I’ve not changed any markup inside, just keeping it in this single content section --}}
+            {{-- STEP 1 --}}
+            {{-- (use exactly the Step 1 markup you pasted before: addresses, datetime, pax, distance/duration cards, "Suivant" button) --}}
 
+            {{-- STEP 2 --}}
+            {{-- (use your Step 2 markup: luggage select, vehicles loop over $vehicles, extras, price estimate, customer details, buttons Previous/Next) --}}
+
+            {{-- STEP 3 --}}
+            {{-- (use your Step 3 markup: summaries, price, terms, buttons Previous/Submit) --}}
         </form>
 
     </div>
@@ -359,80 +627,103 @@
 
 @section('scripts')
 <script>
-let currentDistance = 0; // in km
-let currentDuration = 0; // in minutes
+let currentDistance = 0; // km
+let currentDuration = 0; // minutes
 let currentStep     = 1;
 
-// Step Navigation
+// dummy for Google Maps callback
+function initMap() {}
+
+// scroll to top
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// fill confirmation (step 3)
+function updateBookingSummary() {
+    const pickup   = document.getElementById('pickup_address')?.value || '';
+    const dropoff  = document.getElementById('dropoff_address')?.value || '';
+    const datetime = document.getElementById('pickup_datetime')?.value || '';
+    const pax      = document.getElementById('pax')?.value || '';
+    const luggage  = document.getElementById('luggage')?.value || '';
+    const customer = document.getElementById('customer_name')?.value || '';
+
+    document.getElementById('summary-pickup').textContent     = pickup   || 'À définir';
+    document.getElementById('summary-dropoff').textContent    = dropoff  || 'À définir';
+    document.getElementById('summary-datetime').textContent   = datetime || 'À définir';
+    document.getElementById('summary-passengers').textContent = pax      || 'À définir';
+    document.getElementById('summary-luggage').textContent    = luggage  || 'À définir';
+    document.getElementById('summary-customer').textContent   = customer || 'À définir';
+
+    const vehicleRadio = document.querySelector('input[name="vehicle_class"]:checked');
+    if (vehicleRadio) {
+        const card  = vehicleRadio.closest('.service-card');
+        const name  = card.querySelector('h4')?.textContent || 'À définir';
+        const price = card.querySelector('.text-2xl')?.textContent || 'À définir';
+
+        document.getElementById('summary-vehicle').textContent       = name;
+        document.getElementById('summary-vehicle-price').textContent = price;
+    }
+
+    document.getElementById('summary-total').textContent =
+        document.getElementById('price-estimate')?.textContent || 'À calculer';
+}
+
+// step navigation
 function nextStep(step) {
     if (validateCurrentStep()) {
         showStep(step);
     }
 }
-
 function prevStep(step) {
     showStep(step);
 }
-
 function showStep(step) {
     document.querySelectorAll('.step-transition').forEach(el => el.classList.add('hidden'));
 
-    const targetStep = document.getElementById(`step-${step}-content`);
-    if (targetStep) {
-        targetStep.classList.remove('hidden');
-    }
+    const target = document.getElementById(`step-${step}-content`);
+    if (target) target.classList.remove('hidden');
 
-    document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-        const stepNumber = index + 1;
-        indicator.classList.remove('active', 'completed');
-        if (stepNumber === step) {
-            indicator.classList.add('active');
-        } else if (stepNumber < step) {
-            indicator.classList.add('completed');
-        }
+    document.querySelectorAll('.step-indicator').forEach((ind, idx) => {
+        const n = idx + 1;
+        ind.classList.remove('active', 'completed');
+        if (n === step) ind.classList.add('active');
+        else if (n < step) ind.classList.add('completed');
     });
 
-    const progressBar    = document.getElementById('progress-bar');
-    const progressPercent = (step / 3) * 100;
-    progressBar.style.width = `${progressPercent}%`;
+    document.getElementById('progress-bar').style.width = `${(step / 3) * 100}%`;
 
     currentStep = step;
-
-    if (step === 3) {
-        updateBookingSummary();
-    }
+    if (step === 3) updateBookingSummary();
 }
 
 function validateCurrentStep() {
-    const step = currentStep;
-    let isValid = true;
+    let ok = true;
 
-    if (step === 1) {
+    if (currentStep === 1) {
         const pickup   = document.getElementById('pickup_address').value.trim();
         const dropoff  = document.getElementById('dropoff_address').value.trim();
         const datetime = document.getElementById('pickup_datetime').value;
         const pax      = document.getElementById('pax').value;
 
         if (!pickup || !dropoff || !datetime || !pax) {
-            isValid = false;
+            ok = false;
             alert('Veuillez remplir tous les champs obligatoires.');
         }
-    } else if (step === 2) {
+    } else if (currentStep === 2) {
         const luggage = document.getElementById('luggage').value;
         const vehicle = document.querySelector('input[name="vehicle_class"]:checked');
-
         if (!luggage || !vehicle) {
-            isValid = false;
+            ok = false;
             alert('Veuillez sélectionner un véhicule et indiquer le nombre de bagages.');
         }
     }
 
-    return isValid;
+    return ok;
 }
 
-// Distance via Laravel endpoint (public route)
+// distance API
 let distanceTimeout;
-
 async function updateDistance() {
     const pickup  = document.getElementById('pickup_address').value.trim();
     const dropoff = document.getElementById('dropoff_address').value.trim();
@@ -452,118 +743,79 @@ async function updateDistance() {
                 'Accept': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
             },
-            body: JSON.stringify({
-                origin: pickup,
-                destination: dropoff,
-            }),
+            body: JSON.stringify({ origin: pickup, destination: dropoff }),
         });
 
         const json = await response.json();
 
         if (json.success) {
             const data = json.data;
+            currentDistance = data.distance_value / 1000;
+            currentDuration = data.duration_value / 60;
 
-            currentDistance = data.distance_value / 1000; // meters → km
-            currentDuration = data.duration_value / 60;   // seconds → minutes
-
-            const distanceDisplay = document.getElementById('distance-display');
-            const durationDisplay = document.getElementById('duration-display');
-
-            if (distanceDisplay) {
-                distanceDisplay.textContent = data.distance_text;
-            }
-            if (durationDisplay) {
-                durationDisplay.textContent = data.duration_text;
-            }
+            document.getElementById('distance-display').textContent = data.distance_text;
+            document.getElementById('duration-display').textContent = data.duration_text;
         } else {
-            console.error(json.message || 'Distance error');
             currentDistance = 0;
             currentDuration = 0;
         }
     } catch (e) {
-        console.error('Distance request failed', e);
+        console.error(e);
         currentDistance = 0;
         currentDuration = 0;
     }
 
     updatePrice();
 }
-
 function scheduleDistanceUpdate() {
     clearTimeout(distanceTimeout);
     distanceTimeout = setTimeout(updateDistance, 800);
 }
 
-// Price calculation
+// price
 function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
     const vehicleClass    = selectedVehicle ? selectedVehicle.value : null;
 
-    const childSeat1 = document.querySelector('input[name="child_seat_count"]');
-    const meetGreet1 = document.querySelector('input[name="meet_greet"]');
-    const childSeat  = !!(childSeat1 && childSeat1.checked);
-    const meetGreet  = !!(meetGreet1 && meetGreet1.checked);
+    const childSeat = document.querySelector('input[name="child_seat_count"]')?.checked ?? false;
+    const meetGreet = document.querySelector('input[name="meet_greet"]')?.checked ?? false;
 
-    let basePrice = 0;
-    let perKm     = 0;
-
-    if (vehicleClass) {
-        switch (vehicleClass) {
-            case 'sedan':
-                basePrice = 60;
-                perKm     = 1.50;
-                break;
-            case 'business':
-                basePrice = 80;
-                perKm     = 2.00;
-                break;
-            case 'van':
-                basePrice = 100;
-                perKm     = 2.50;
-                break;
-            default:
-                basePrice = 60;
-                perKm     = 1.50;
-        }
+    let basePrice = 0, perKm = 0;
+    switch (vehicleClass) {
+        case 'business':
+            basePrice = 80; perKm = 2.0; break;
+        case 'van':
+            basePrice = 100; perKm = 2.5; break;
+        case 'sedan':
+        default:
+            basePrice = 60; perKm = 1.5;
     }
 
     let total = basePrice;
-
-    if (currentDistance > 0) {
-        total += currentDistance * perKm;
-    }
-
+    if (currentDistance > 0) total += currentDistance * perKm;
     if (childSeat) total += 15;
     if (meetGreet) total += 10;
 
-    const priceElement = document.getElementById('price-estimate');
-    if (priceElement) {
-        priceElement.textContent = total > 0 ? `${Math.round(total)}€` : 'À calculer';
-    }
+    const el = document.getElementById('price-estimate');
+    if (el) el.textContent = total > 0 ? `${Math.round(total)}€` : 'À calculer';
 }
 
-// Vehicle selection
+// vehicle select
 function selectVehicle(vehicleClass, el) {
-    document.querySelectorAll('.service-card').forEach(card => {
-        card.classList.remove('selected');
-    });
-
+    document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
     el.classList.add('selected');
-
     const radio = el.querySelector('.vehicle-radio');
-    radio.checked = true;
-
+    if (radio) radio.checked = true;
     updatePrice();
 }
 
-// TODO: keep / add your updateBookingSummary() + scrollToTop() functions here.
+// init
+document.addEventListener('DOMContentLoaded', () => {
+    const pickup  = document.getElementById('pickup_address');
+    const dropoff = document.getElementById('dropoff_address');
 
-document.addEventListener('DOMContentLoaded', function () {
-    const pickupInput  = document.getElementById('pickup_address');
-    const dropoffInput = document.getElementById('dropoff_address');
-
-    if (pickupInput)  pickupInput.addEventListener('input', scheduleDistanceUpdate);
-    if (dropoffInput) dropoffInput.addEventListener('input', scheduleDistanceUpdate);
+    if (pickup)  pickup.addEventListener('input', scheduleDistanceUpdate);
+    if (dropoff) dropoff.addEventListener('input', scheduleDistanceUpdate);
 
     const form = document.getElementById('booking-form');
     if (form) {
