@@ -22,6 +22,9 @@ use App\Http\Controllers\Customer\CustomerDashboardController;
 */
 // Home
 Route::view('/', 'home.index')->name('home');
+// Public route for distance calculation
+Route::post('/booking/distance', [BookingController::class, 'showDistance'])
+    ->name('booking.distance');
 
 Route::get('/booking', [BookingController::class, 'index'])->name('booking');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
@@ -91,8 +94,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/bookings/{id}/cancel', [CustomerDashboardController::class, 'cancel'])->name('bookings.cancel');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::post('/booking/distance', [BookingController::class, 'showDistance'])
-    ->name('booking.distance');
+    
     });
 });
 
