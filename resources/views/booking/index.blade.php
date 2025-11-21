@@ -3,9 +3,6 @@
 @section('title', 'Réserver un VTC - Transfert Paris Aéroports')
 @section('description', 'Réservez votre chauffeur privé pour les aéroports CDG, Orly et Beauvais. Tarifs fixes, service premium 24h/24.')
 
-@section('head')
-<script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"></script>
-@endsection
 
 @section('content')
 @endsection
@@ -1817,11 +1814,11 @@ button:hover::before {
 
 @section('scripts')
 <script>
-let currentDistance = 0;
-let currentDuration = 0;
-let currentStep = 1;
+let currentDistance = 0; // in km
+let currentDuration = 0; // in minutes
+let currentStep     = 1;
 
-// Step Navigation Functions
+// Step Navigation (unchanged)
 function nextStep(step) {
     if (validateCurrentStep()) {
         showStep(step);
@@ -1833,19 +1830,13 @@ function prevStep(step) {
 }
 
 function showStep(step) {
-    // Hide all steps
-    document.querySelectorAll('.step-transition').forEach(el => {
-        el.classList.add('hidden');
-    });
+    document.querySelectorAll('.step-transition').forEach(el => el.classList.add('hidden'));
 
-    // Show target step
     const targetStep = document.getElementById(`step-${step}-content`);
     if (targetStep) {
         targetStep.classList.remove('hidden');
-        targetStep.classList.add('step-enter-active');
     }
 
-    // Update step indicators
     document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
         const stepNumber = index + 1;
         indicator.classList.remove('active', 'completed');
@@ -1856,14 +1847,12 @@ function showStep(step) {
         }
     });
 
-    // Update progress bar
-    const progressBar = document.getElementById('progress-bar');
+    const progressBar    = document.getElementById('progress-bar');
     const progressPercent = (step / 3) * 100;
     progressBar.style.width = `${progressPercent}%`;
 
     currentStep = step;
 
-    // Update summary if on step 3
     if (step === 3) {
         updateBookingSummary();
     }
@@ -1874,10 +1863,10 @@ function validateCurrentStep() {
     let isValid = true;
 
     if (step === 1) {
-        const pickup = document.getElementById('pickup_address').value.trim();
-        const dropoff = document.getElementById('dropoff_address').value.trim();
+        const pickup   = document.getElementById('pickup_address').value.trim();
+        const dropoff  = document.getElementById('dropoff_address').value.trim();
         const datetime = document.getElementById('pickup_datetime').value;
-        const pax = document.getElementById('pax').value;
+        const pax      = document.getElementById('pax').value;
 
         if (!pickup || !dropoff || !datetime || !pax) {
             isValid = false;
@@ -1896,303 +1885,152 @@ function validateCurrentStep() {
     return isValid;
 }
 
-function updateBookingSummary() {
-    // Update route info
-    document.getElementById('summary-pickup').textContent = document.getElementById('pickup_address').value;
-    document.getElementById('summary-dropoff').textContent = document.getElementById('dropoff_address').value;
-    const dtVal = document.getElementById('pickup_datetime').value;
-    document.getElementById('summary-datetime').textContent = dtVal
-      ? new Date(dtVal).toLocaleString('fr-FR')
-      : 'À définir';
-    document.getElementById('summary-passengers').textContent = document.getElementById('pax').value;
-    document.getElementById('summary-luggage').textContent = document.getElementById('luggage').value;
+// --- NEW PART: call Laravel Distance Matrix endpoint ---
+let distanceTimeout;
 
-    // Update vehicle info
-    const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
-    if (selectedVehicle) {
-        const vehicleCard = selectedVehicle.closest('.service-card');
-        const vehicleName = vehicleCard.querySelector('h4').textContent;
-        const vehiclePrice = vehicleCard.querySelector('.text-2xl').textContent;
-        document.getElementById('summary-vehicle').textContent = vehicleName;
-        document.getElementById('summary-vehicle-price').textContent = vehiclePrice;
-    }
+async function updateDistance() {
+    const pickup  = document.getElementById('pickup_address').value.trim();
+    const dropoff = document.getElementById('dropoff_address').value.trim();
 
-    // Update extras
-    const childSeatEl = document.querySelector('input[name="child_seat_count"]');
-    const meetGreetEl = document.querySelector('input[name="meet_greet"]');
-    const childSeat = !!(childSeatEl && childSeatEl.checked);
-    const meetGreet = !!(meetGreetEl && meetGreetEl.checked);
-    const extrasList = document.getElementById('summary-extras');
-    extrasList.innerHTML = '';
-
-    if (childSeat) {
-        const li = document.createElement('li');
-        li.textContent = 'Siège enfant (+15€)';
-        extrasList.appendChild(li);
-    }
-    if (meetGreet) {
-        const li = document.createElement('li');
-        li.textContent = 'Accueil personnalisé (+10€)';
-        extrasList.appendChild(li);
-    }
-    if (!childSeat && !meetGreet) {
-        const li = document.createElement('li');
-        li.textContent = 'Aucun service supplémentaire';
-        extrasList.appendChild(li);
-    }
-
-    // Update total price
-    const totalPrice = document.getElementById('price-estimate').textContent;
-    document.getElementById('summary-total').textContent = totalPrice;
-
-    // Update customer info
-    const customerName = document.getElementById('customer_name');
-    if (customerName) {
-        document.getElementById('summary-customer').textContent = customerName.value;
-    }
-}
-
-function selectVehicle(vehicleClass, el) {
-    // Remove selected class from all cards
-    document.querySelectorAll('.service-card').forEach(card => {
-        card.classList.remove('selected');
-    });
-
-    // Add selected class to clicked card
-    el.classList.add('selected');
-
-    // Check the radio button
-    const radio = el.querySelector('.vehicle-radio');
-    radio.checked = true;
-
-    // Update price
-    updatePrice();
-}
-
-function scrollToTop() {
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-    });
-}
-
-// Enhanced animations on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Add staggered animations to cards
-    const cards = document.querySelectorAll('.booking-card, .service-card');
-    cards.forEach((card, index) => {
-        card.classList.add(`animate-stagger-${(index % 4) + 1}`);
-    });
-
-    // Add ripple effect to buttons
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(button => {
-        button.classList.add('ripple');
-    });
-});
-
-// Smooth scrolling for navigation
-function smoothScrollToStep(stepNumber) {
-    const stepElement = document.getElementById(`step-${stepNumber}-content`);
-    if (stepElement) {
-        stepElement.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-    }
-}
-
-function initMap() {
-    // Initialize autocomplete for addresses using Google Places API
-    const pickupInput = document.getElementById('pickup_address');
-    const dropoffInput = document.getElementById('dropoff_address');
-
-    const pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput, {
-        componentRestrictions: { country: 'fr' },
-        fields: ['formatted_address', 'geometry', 'name']
-    });
-
-    const dropoffAutocomplete = new google.maps.places.Autocomplete(dropoffInput, {
-        componentRestrictions: { country: 'fr' },
-        fields: ['formatted_address', 'geometry', 'name']
-    });
-
-    pickupAutocomplete.addListener('place_changed', function() {
-        const place = pickupAutocomplete.getPlace();
-        if (place.geometry) {
-            pickupInput.value = place.formatted_address;
-            updateDistance();
-        }
-    });
-
-    dropoffAutocomplete.addListener('place_changed', function() {
-        const place = dropoffAutocomplete.getPlace();
-        if (place.geometry) {
-            dropoffInput.value = place.formatted_address;
-            updateDistance();
-        }
-    });
-
-    // Update distance on input change (with debounce)
-    let distanceTimeout;
-    function debouncedUpdateDistance() {
-        clearTimeout(distanceTimeout);
-        distanceTimeout = setTimeout(updateDistance, 1000);
-    }
-
-    pickupInput.addEventListener('input', debouncedUpdateDistance);
-    dropoffInput.addEventListener('input', debouncedUpdateDistance);
-
-    // Update price on form changes
-    const form = document.getElementById('booking-form');
-    form.addEventListener('change', updatePrice);
-    form.addEventListener('input', updatePrice);
-}
-
-function updateRoute() {
-    const pickupAddress = document.getElementById('pickup_address').value.trim();
-    const dropoffAddress = document.getElementById('dropoff_address').value.trim();
-
-    if (!pickupAddress || !dropoffAddress) {
-        // Clear route if addresses are empty
-        directionsRenderer.setDirections({ routes: [] });
+    if (!pickup || !dropoff) {
         currentDistance = 0;
         currentDuration = 0;
         updatePrice();
         return;
     }
 
-    const request = {
-        origin: pickupAddress,
-        destination: dropoffAddress,
-        travelMode: google.maps.TravelMode.DRIVING,
-        unitSystem: google.maps.UnitSystem.METRIC
-    };
+    try {
+        const response = await fetch("{{ route('booking.distance') }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            },
+            body: JSON.stringify({
+                origin: pickup,
+                destination: dropoff,
+            }),
+        });
 
-    directionsService.route(request, (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
-            directionsRenderer.setDirections(result);
+        const json = await response.json();
 
-            // Store distance and duration
-            const route = result.routes[0];
-            const leg = route.legs[0];
-            currentDistance = leg.distance.value / 1000; // km
-            currentDuration = leg.duration.value / 60; // minutes
+        if (json.success) {
+            const data = json.data;
 
-            // Add custom markers
-            if (pickupMarker) pickupMarker.setMap(null);
-            if (dropoffMarker) dropoffMarker.setMap(null);
+            currentDistance = data.distance_value / 1000; // meters → km
+            currentDuration = data.duration_value / 60;   // seconds → minutes
 
-            pickupMarker = new google.maps.Marker({
-                position: leg.start_location,
-                map: map,
-                title: 'Point de départ',
-                icon: {
-                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" fill="#10B981" stroke="white" stroke-width="2"/>
-                            <text x="12" y="16" text-anchor="middle" fill="white" font-size="12" font-weight="bold">A</text>
-                        </svg>
-                    `),
-                    scaledSize: new google.maps.Size(24, 24)
-                }
-            });
+            const distanceDisplay = document.getElementById('distance-display');
+            const durationDisplay = document.getElementById('duration-display');
 
-            dropoffMarker = new google.maps.Marker({
-                position: leg.end_location,
-                map: map,
-                title: 'Destination',
-                icon: {
-                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="10" fill="#EF4444" stroke="white" stroke-width="2"/>
-                            <text x="12" y="16" text-anchor="middle" fill="white" font-size="12" font-weight="bold">B</text>
-                        </svg>
-                    `),
-                    scaledSize: new google.maps.Size(24, 24)
-                }
-            });
-
-            // Fit map to route bounds
-            map.fitBounds(route.bounds);
-
-            updatePrice();
+            if (distanceDisplay) {
+                distanceDisplay.textContent = data.distance_text;
+            }
+            if (durationDisplay) {
+                durationDisplay.textContent = data.duration_text;
+            }
         } else {
-            console.error('Directions request failed:', status);
+            console.error(json.message || 'Distance error');
             currentDistance = 0;
             currentDuration = 0;
-            updatePrice();
         }
-    });
+    } catch (e) {
+        console.error('Distance request failed', e);
+        currentDistance = 0;
+        currentDuration = 0;
+    }
+
+    updatePrice();
 }
 
+// Debounce for typing in address fields
+function scheduleDistanceUpdate() {
+    clearTimeout(distanceTimeout);
+    distanceTimeout = setTimeout(updateDistance, 800);
+}
+
+// --- Price calculation (reuse yours, just without google.maps) ---
 function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
-    const vehicleClass = selectedVehicle ? selectedVehicle.value : null;
+    const vehicleClass    = selectedVehicle ? selectedVehicle.value : null;
+
     const childSeat1 = document.querySelector('input[name="child_seat_count"]');
     const meetGreet1 = document.querySelector('input[name="meet_greet"]');
-    const childSeat = !!(childSeat1 && childSeat1.checked);
-    const meetGreet = !!(meetGreet1 && meetGreet1.checked);
+    const childSeat  = !!(childSeat1 && childSeat1.checked);
+    const meetGreet  = !!(meetGreet1 && meetGreet1.checked);
 
     let basePrice = 0;
-    let perKm = 0;
+    let perKm     = 0;
 
-    // Get pricing based on selected vehicle
     if (vehicleClass) {
-        // These should match your vehicle pricing from the database
-        switch(vehicleClass) {
+        switch (vehicleClass) {
             case 'sedan':
                 basePrice = 60;
-                perKm = 1.50;
+                perKm     = 1.50;
                 break;
             case 'business':
                 basePrice = 80;
-                perKm = 2.00;
+                perKm     = 2.00;
                 break;
             case 'van':
                 basePrice = 100;
-                perKm = 2.50;
+                perKm     = 2.50;
                 break;
             default:
                 basePrice = 60;
-                perKm = 1.50;
+                perKm     = 1.50;
         }
     }
 
     let total = basePrice;
 
-    // Add distance-based pricing if we have a route
     if (currentDistance > 0) {
         total += currentDistance * perKm;
     }
 
-    // Add extras
     if (childSeat) total += 15;
     if (meetGreet) total += 10;
 
     const priceElement = document.getElementById('price-estimate');
     if (priceElement) {
-        if (total > 0) {
-            priceElement.textContent = `${Math.round(total)}€`;
-        } else {
-            priceElement.textContent = 'À calculer';
-        }
+        priceElement.textContent = total > 0 ? `${Math.round(total)}€` : 'À calculer';
     }
 
-    // Update distance and duration displays
-    const distanceDisplay = document.getElementById('distance-display');
-    const durationDisplay = document.getElementById('duration-display');
-
-    if (distanceDisplay) {
-        distanceDisplay.textContent = currentDistance > 0 ? `${currentDistance.toFixed(1)} km` : 'À calculer';
-    }
-
-    if (durationDisplay) {
-        durationDisplay.textContent = currentDuration > 0 ? `${Math.round(currentDuration)} min` : 'À calculer';
-    }
+    // distance / duration display already updated in updateDistance()
 }
 
-// Initialize map when Google Maps API loads
-window.initMap = initMap;
+// Vehicle selection (same as before)
+function selectVehicle(vehicleClass, el) {
+    document.querySelectorAll('.service-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    el.classList.add('selected');
+
+    const radio = el.querySelector('.vehicle-radio');
+    radio.checked = true;
+
+    updatePrice();
+}
+
+// Summary etc. – keep your existing functions (updateBookingSummary, scrollToTop, etc.)
+// I’m not repeating them here, just leave them as they are above or below,
+// they don’t depend on google.maps.
+
+// Init: attach events
+document.addEventListener('DOMContentLoaded', function () {
+    const pickupInput  = document.getElementById('pickup_address');
+    const dropoffInput = document.getElementById('dropoff_address');
+
+    if (pickupInput)  pickupInput.addEventListener('input', scheduleDistanceUpdate);
+    if (dropoffInput) dropoffInput.addEventListener('input', scheduleDistanceUpdate);
+
+    const form = document.getElementById('booking-form');
+    if (form) {
+        form.addEventListener('change', updatePrice);
+        form.addEventListener('input', updatePrice);
+    }
+});
 </script>
 @endsection

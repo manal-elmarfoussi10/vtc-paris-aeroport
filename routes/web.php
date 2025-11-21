@@ -91,6 +91,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/bookings/{id}/cancel', [CustomerDashboardController::class, 'cancel'])->name('bookings.cancel');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::post('/booking/distance', [BookingController::class, 'showDistance'])
+    ->name('booking.distance');
     });
 });
 
