@@ -20,6 +20,7 @@ class VehicleSeeder extends Seeder
                 'per_km' => 1.80,
                 'per_min' => 0.50,
                 'is_active' => true,
+                'sort_order' => 1,
                 'description' => 'Véhicules économiques pour déplacements quotidiens.',
             ],
             [
@@ -32,6 +33,7 @@ class VehicleSeeder extends Seeder
                 'per_km' => 2.20,
                 'per_min' => 0.70,
                 'is_active' => true,
+                'sort_order' => 2,
                 'description' => 'Mercedes Classe E, BMW Série 5 ou équivalent. Idéal pour vos déplacements professionnels et transferts aéroports.',
             ],
             [
@@ -44,6 +46,7 @@ class VehicleSeeder extends Seeder
                 'per_km' => 2.75,
                 'per_min' => 0.80,
                 'is_active' => true,
+                'sort_order' => 3,
                 'description' => 'Mercedes Classe V ou équivalent. Parfait pour les groupes et familles avec bagages volumineux.',
             ],
             [
@@ -56,6 +59,7 @@ class VehicleSeeder extends Seeder
                 'per_km' => 1.90,
                 'per_min' => 0.60,
                 'is_active' => true,
+                'sort_order' => 4,
                 'description' => 'Véhicules électriques écologiques pour un transport durable.',
             ],
         ];
