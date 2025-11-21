@@ -34,8 +34,12 @@ class BookingController extends Controller
     {
         $validated = $request->validate([
             'pickup_address'  => 'required|string|max:255',
+            'pickup_lat'      => 'nullable|numeric',
+            'pickup_lng'      => 'nullable|numeric',
             'dropoff_address' => 'required|string|max:255',
-            'pickup_datetime' => 'required|date',
+            'dropoff_lat'     => 'nullable|numeric',
+            'dropoff_lng'     => 'nullable|numeric',
+            'pickup_time'     => 'required|date',   // 👈 use pickup_time
             'pax'             => 'required|integer|min:1|max:8',
             'luggage'         => 'required|integer|min:0|max:8',
             'vehicle_class'   => 'required|string',
@@ -44,12 +48,11 @@ class BookingController extends Controller
             'meet_greet'      => 'nullable',
             'notes'           => 'nullable|string',
         ]);
-
-        // Very simple example – adapt columns to your Booking model
+    
         $booking = Booking::create([
             'pickup_address'  => $validated['pickup_address'],
             'dropoff_address' => $validated['dropoff_address'],
-            'pickup_datetime' => $validated['pickup_datetime'],
+            'pickup_time'     => $validated['pickup_time'],   // 👈 save it
             'pax'             => $validated['pax'],
             'luggage'         => $validated['luggage'],
             'vehicle_class'   => $validated['vehicle_class'],

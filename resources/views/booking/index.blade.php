@@ -765,10 +765,7 @@ button:active {
                             <h3 class="text-lg font-semibold mb-3">Classe de véhicule *</h3>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 @foreach($vehicles as $vehicle)
-                                    <div
-                                        class="service-card animate-stagger-{{ $loop->index + 1 }}"
-                                        onclick="selectVehicle('{{ $vehicle->class }}', this)"
-                                    >
+                                    <div class="service-card animate-stagger-{{ $loop->index + 1 }}">
                                         <input
                                             type="radio"
                                             class="hidden vehicle-radio"
@@ -794,9 +791,16 @@ button:active {
                                                 class="w-full h-24 object-cover rounded-lg mb-3"
                                             >
                                         @endif
-                                        <p class="text-2xl font-bold text-gray-900">
+                                        <p class="text-2xl font-bold text-gray-900 mb-3">
                                             {{ number_format($vehicle->base_rate, 0, ',', ' ') }}€
                                         </p>
+                                        <button
+                                            type="button"
+                                            class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                                            onclick="selectVehicle('{{ $vehicle->class }}', this.closest('.service-card'))"
+                                        >
+                                            Choisir ce véhicule
+                                        </button>
                                     </div>
                                 @endforeach
                             </div>

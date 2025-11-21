@@ -21,6 +21,8 @@
                 <input type="text" id="pickup_address" name="pickup_address"
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                        placeholder="Entrez l'adresse de départ" required value="{{ old('pickup_address') }}">
+                <input type="hidden" id="pickup_lat" name="pickup_lat" value="{{ old('pickup_lat') }}">
+                <input type="hidden" id="pickup_lng" name="pickup_lng" value="{{ old('pickup_lng') }}">
                 @error('pickup_address')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -34,6 +36,8 @@
                 <input type="text" id="dropoff_address" name="dropoff_address"
                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                        placeholder="Entrez l'adresse d'arrivée" required value="{{ old('dropoff_address') }}">
+                <input type="hidden" id="dropoff_lat" name="dropoff_lat" value="{{ old('dropoff_lat') }}">
+                <input type="hidden" id="dropoff_lng" name="dropoff_lng" value="{{ old('dropoff_lng') }}">
                 @error('dropoff_address')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
@@ -159,4 +163,36 @@
         </form>
     </div>
 </div>
+
+<script type="text/javascript"
+    src="https://maps.google.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places">
+</script>
+
+<script>
+    $(document).ready(function () {
+        // Initialize autocomplete for pickup address
+        var pickupInput = document.getElementById('pickup_address');
+        var pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput);
+
+        pickupAutocomplete.addListener('place_changed', function () {
+            var place = pickupAutocomplete.getPlace();
+            if (place.geometry) {
+                $('#pickup_lat').val(place.geometry['location'].lat());
+                $('#pickup_lng').val(place.geometry['location'].lng());
+            }
+        });
+
+        // Initialize autocomplete for dropoff address
+        var dropoffInput = document.getElementById('dropoff_address');
+        var dropoffAutocomplete = new google.maps.places.Autocomplete(dropoffInput);
+
+        dropoffAutocomplete.addListener('place_changed', function () {
+            var place = dropoffAutocomplete.getPlace();
+            if (place.geometry) {
+                $('#dropoff_lat').val(place.geometry['location'].lat());
+                $('#dropoff_lng').val(place.geometry['location'].lng());
+            }
+        });
+    });
+</script>
 @endsection
