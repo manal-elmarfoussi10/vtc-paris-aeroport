@@ -4,6 +4,9 @@
 @section('description', 'Créez votre réservation de VTC pour les aéroports parisiens.')
 
 @section('content')
+<gmpx-api-loader key="{{ env('GOOGLE_MAP_KEY') }}" solution-channel="GMP_QB_addressselection_v4_cABCDE">
+</gmpx-api-loader>
+
 <x-auth-session-status class="mb-4" :status="session('status')" />
 
 <div class="max-w-4xl mx-auto py-12">
@@ -41,6 +44,18 @@
                 @error('dropoff_address')
                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                 @enderror
+            </div>
+
+            <!-- Address Selection Map -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Sélection d'adresse via carte (optionnel)
+                </label>
+                <iframe src="https://storage.googleapis.com/maps-solutions-g66ge5rhlx/address-selection/rko0/address-selection.html"
+                  width="100%" height="400"
+                  style="border:0;"
+                  loading="lazy">
+                </iframe>
             </div>
 
             <!-- Pickup Time -->
@@ -164,35 +179,51 @@
     </div>
 </div>
 
-<script type="text/javascript"
-    src="https://maps.google.com/maps/api/js?key={{ env('GOOGLE_MAP_KEY') }}&libraries=places">
-</script>
+<script type="module">
+    import { APILoader } from 'https://ajax.googleapis.com/ajax/libs/@googlemaps/extended-component-library/0.6.11/index.min.js';
 
-<script>
-    $(document).ready(function () {
+    async function initAutocomplete() {
+        const { Autocomplete } = await APILoader.importLibrary('places');
+
         // Initialize autocomplete for pickup address
-        var pickupInput = document.getElementById('pickup_address');
-        var pickupAutocomplete = new google.maps.places.Autocomplete(pickupInput);
+        const pickupInput = document.getElementById('pickup_address');
+        const pickupAutocomplete = new Autocomplete(pickupInput, {
+            fields: ['address_components', 'geometry', 'name'],
+            types: ['address'],
+        });
 
-        pickupAutocomplete.addListener('place_changed', function () {
-            var place = pickupAutocomplete.getPlace();
-            if (place.geometry) {
-                $('#pickup_lat').val(place.geometry['location'].lat());
-                $('#pickup_lng').val(place.geometry['location'].lng());
+        pickupAutocomplete.addListener('place_changed', () => {
+            const place = pickupAutocomplete.getPlace();
+            if (!place.geometry) {
+                window.alert(`No details available for input: '${place.name}'`);
+                return;
+            }
+            if (place.geometry && place.geometry.location) {
+                document.getElementById('pickup_lat').value = place.geometry.location.lat();
+                document.getElementById('pickup_lng').value = place.geometry.location.lng();
             }
         });
 
         // Initialize autocomplete for dropoff address
-        var dropoffInput = document.getElementById('dropoff_address');
-        var dropoffAutocomplete = new google.maps.places.Autocomplete(dropoffInput);
+        const dropoffInput = document.getElementById('dropoff_address');
+        const dropoffAutocomplete = new Autocomplete(dropoffInput, {
+            fields: ['address_components', 'geometry', 'name'],
+            types: ['address'],
+        });
 
-        dropoffAutocomplete.addListener('place_changed', function () {
-            var place = dropoffAutocomplete.getPlace();
-            if (place.geometry) {
-                $('#dropoff_lat').val(place.geometry['location'].lat());
-                $('#dropoff_lng').val(place.geometry['location'].lng());
+        dropoffAutocomplete.addListener('place_changed', () => {
+            const place = dropoffAutocomplete.getPlace();
+            if (!place.geometry) {
+                window.alert(`No details available for input: '${place.name}'`);
+                return;
+            }
+            if (place.geometry && place.geometry.location) {
+                document.getElementById('dropoff_lat').value = place.geometry.location.lat();
+                document.getElementById('dropoff_lng').value = place.geometry.location.lng();
             }
         });
-    });
+    }
+
+    initAutocomplete();
 </script>
 @endsection
