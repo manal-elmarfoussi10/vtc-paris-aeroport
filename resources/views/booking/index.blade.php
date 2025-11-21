@@ -610,15 +610,379 @@ button:active {
         <form method="POST" action="{{ route('booking.store') }}" class="space-y-8 perspective-1000 transform-3d bg-dynamic-gradient" id="booking-form">
             @csrf
             <x-auth-session-status class="mb-4" :status="session('status')" />
-
-            {{-- STEP 1 --}}
-            {{-- (use exactly the Step 1 markup you pasted before: addresses, datetime, pax, distance/duration cards, "Suivant" button) --}}
-
-            {{-- STEP 2 --}}
-            {{-- (use your Step 2 markup: luggage select, vehicles loop over $vehicles, extras, price estimate, customer details, buttons Previous/Next) --}}
-
-            {{-- STEP 3 --}}
-            {{-- (use your Step 3 markup: summaries, price, terms, buttons Previous/Submit) --}}
+        
+            {{-- STEP 1 – TRAJET --}}
+            <div id="step-1-content" class="step-transition">
+                <div class="booking-card p-6 md:p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mr-3">
+                            1
+                        </span>
+                        Informations sur votre trajet
+                    </h2>
+        
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {{-- Left side: form fields --}}
+                        <div class="space-y-5">
+                            {{-- Pickup --}}
+                            <div>
+                                <label for="pickup_address" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Adresse de départ *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="pickup_address"
+                                    name="pickup_address"
+                                    class="w-full form-input-modern"
+                                    placeholder="Ex : 10 Rue de Rivoli, 75001 Paris"
+                                    value="{{ old('pickup_address') }}"
+                                    required
+                                >
+                                @error('pickup_address')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+        
+                            {{-- Dropoff --}}
+                            <div>
+                                <label for="dropoff_address" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Adresse d'arrivée *
+                                </label>
+                                <input
+                                    type="text"
+                                    id="dropoff_address"
+                                    name="dropoff_address"
+                                    class="w-full form-input-modern"
+                                    placeholder="Ex : Aéroport CDG, Terminal 2E"
+                                    value="{{ old('dropoff_address') }}"
+                                    required
+                                >
+                                @error('dropoff_address')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+        
+                            {{-- Date & time --}}
+                            <div>
+                                <label for="pickup_datetime" class="block text-sm font-medium text-gray-700 mb-1">
+                                    Date & heure de prise en charge *
+                                </label>
+                                <input
+                                    type="datetime-local"
+                                    id="pickup_datetime"
+                                    name="pickup_datetime"
+                                    class="w-full form-input-modern"
+                                    value="{{ old('pickup_datetime') }}"
+                                    required
+                                >
+                                @error('pickup_datetime')
+                                    <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                @enderror
+                            </div>
+        
+                            {{-- Passengers --}}
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="pax" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Passagers *
+                                    </label>
+                                    <select id="pax" name="pax" class="w-full form-input-modern" required>
+                                        <option value="">Sélectionnez</option>
+                                        @for($i = 1; $i <= 8; $i++)
+                                            <option value="{{ $i }}" {{ old('pax') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                    @error('pax')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+        
+                                <div>
+                                    <label for="luggage" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Bagages *
+                                    </label>
+                                    <select id="luggage" name="luggage" class="w-full form-input-modern" required>
+                                        <option value="">Sélectionnez</option>
+                                        @for($i = 0; $i <= 8; $i++)
+                                            <option value="{{ $i }}" {{ old('luggage') == $i ? 'selected' : '' }}>{{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                    @error('luggage')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+        
+                        {{-- Right side: map + distance --}}
+                        <div class="space-y-5">
+                            <div class="map-container loading">
+                                <div id="map"></div>
+                            </div>
+        
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="price-display relative overflow-hidden">
+                                    <p class="text-sm opacity-80">Distance estimée</p>
+                                    <p class="mt-2 text-2xl font-bold" id="distance-display">–</p>
+                                </div>
+                                <div class="price-display relative overflow-hidden">
+                                    <p class="text-sm opacity-80">Durée estimée</p>
+                                    <p class="mt-2 text-2xl font-bold" id="duration-display">–</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        
+                    {{-- Step 1 actions --}}
+                    <div class="mt-8 flex justify-end">
+                        <button
+                            type="button"
+                            onclick="nextStep(2)"
+                            class="inline-flex items-center px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ripple"
+                        >
+                            Continuer
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        
+            {{-- STEP 2 – DÉTAILS & VÉHICULE --}}
+            <div id="step-2-content" class="step-transition hidden">
+                <div class="booking-card p-6 md:p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mr-3">
+                            2
+                        </span>
+                        Choisissez votre véhicule et options
+                    </h2>
+        
+                    <div class="space-y-8">
+                        {{-- Vehicle list --}}
+                        <div>
+                            <h3 class="text-lg font-semibold mb-3">Classe de véhicule *</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                @foreach($vehicles as $vehicle)
+                                    <div
+                                        class="service-card animate-stagger-{{ $loop->index + 1 }}"
+                                        onclick="selectVehicle('{{ $vehicle->class }}', this)"
+                                    >
+                                        <input
+                                            type="radio"
+                                            class="hidden vehicle-radio"
+                                            name="vehicle_class"
+                                            value="{{ $vehicle->class }}"
+                                            id="vehicle_{{ $vehicle->id }}"
+                                        >
+                                        <div class="flex justify-between items-start mb-2">
+                                            <h4 class="font-semibold text-gray-900">
+                                                {{ $vehicle->name }}
+                                            </h4>
+                                            <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700">
+                                                {{ $vehicle->capacity_pax }} pers.
+                                            </span>
+                                        </div>
+                                        <p class="text-sm text-gray-600 mb-2">
+                                            {{ $vehicle->getClassLabelAttribute() }}
+                                        </p>
+                                        @if($vehicle->photo_path)
+                                            <img
+                                                src="{{ asset('storage/' . $vehicle->photo_path) }}"
+                                                alt="{{ $vehicle->name }}"
+                                                class="w-full h-24 object-cover rounded-lg mb-3"
+                                            >
+                                        @endif
+                                        <p class="text-2xl font-bold text-gray-900">
+                                            {{ number_format($vehicle->base_rate, 0, ',', ' ') }}€
+                                        </p>
+                                    </div>
+                                @endforeach
+                            </div>
+                            @error('vehicle_class')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+        
+                        {{-- Options --}}
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="space-y-2">
+                                <h3 class="text-lg font-semibold">Options supplémentaires</h3>
+        
+                                <label class="flex items-center space-x-3">
+                                    <input
+                                        type="checkbox"
+                                        id="child_seat_count"
+                                        name="child_seat_count"
+                                        value="1"
+                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                                        {{ old('child_seat_count') ? 'checked' : '' }}
+                                    >
+                                    <span class="text-sm text-gray-700">Siège enfant (+15€)</span>
+                                </label>
+        
+                                <label class="flex items-center space-x-3">
+                                    <input
+                                        type="checkbox"
+                                        id="meet_greet"
+                                        name="meet_greet"
+                                        value="1"
+                                        class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                                        {{ old('meet_greet') ? 'checked' : '' }}
+                                    >
+                                    <span class="text-sm text-gray-700">Accueil à l'aéroport (+10€)</span>
+                                </label>
+                            </div>
+        
+                            {{-- Customer --}}
+                            <div class="space-y-3">
+                                <h3 class="text-lg font-semibold">Vos coordonnées</h3>
+        
+                                <div>
+                                    <label for="customer_name" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Nom & prénom *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="customer_name"
+                                        name="customer_name"
+                                        class="w-full form-input-modern"
+                                        placeholder="Ex : Jean Dupont"
+                                        value="{{ old('customer_name') }}"
+                                        required
+                                    >
+                                    @error('customer_name')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+        
+                                <div>
+                                    <label for="customer_phone" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Téléphone
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="customer_phone"
+                                        name="customer_phone"
+                                        class="w-full form-input-modern"
+                                        placeholder="+33 6 12 34 56 78"
+                                        value="{{ old('customer_phone') }}"
+                                    >
+                                </div>
+                            </div>
+        
+                            {{-- Price --}}
+                            <div class="space-y-3">
+                                <h3 class="text-lg font-semibold">Prix estimé</h3>
+                                <div class="price-display">
+                                    <p class="text-sm opacity-80">Montant estimatif du trajet</p>
+                                    <p class="mt-3 text-3xl font-extrabold" id="price-estimate">
+                                        À calculer
+                                    </p>
+                                    <p class="mt-1 text-xs opacity-70">
+                                        Prix final confirmé après validation de votre réservation.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+        
+                        {{-- Notes --}}
+                        <div>
+                            <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">
+                                Commentaires au chauffeur (optionnel)
+                            </label>
+                            <textarea
+                                id="notes"
+                                name="notes"
+                                rows="3"
+                                class="w-full form-input-modern"
+                                placeholder="Interphone, code porte, numéro de vol..."
+                            >{{ old('notes') }}</textarea>
+                        </div>
+                    </div>
+        
+                    {{-- Step 2 actions --}}
+                    <div class="mt-8 flex justify-between">
+                        <button type="button" onclick="prevStep(1)" class="inline-flex items-center px-5 py-3 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 ripple">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Retour
+                        </button>
+        
+                        <button type="button" onclick="nextStep(3)" class="inline-flex items-center px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ripple">
+                            Continuer
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        
+            {{-- STEP 3 – CONFIRMATION --}}
+            <div id="step-3-content" class="step-transition hidden">
+                <div class="booking-card p-6 md:p-8 mb-8">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6 flex items-center">
+                        <span class="w-10 h-10 flex items-center justify-center rounded-full bg-blue-100 text-blue-600 mr-3">
+                            3
+                        </span>
+                        Vérifiez et confirmez votre réservation
+                    </h2>
+        
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="space-y-3">
+                            <h3 class="font-semibold text-gray-800 mb-2">Trajet</h3>
+                            <p class="text-sm text-gray-600"><strong>Départ :</strong> <span id="summary-pickup">–</span></p>
+                            <p class="text-sm text-gray-600"><strong>Arrivée :</strong> <span id="summary-dropoff">–</span></p>
+                            <p class="text-sm text-gray-600"><strong>Date & heure :</strong> <span id="summary-datetime">–</span></p>
+                            <p class="text-sm text-gray-600"><strong>Passagers :</strong> <span id="summary-passengers">–</span></p>
+                            <p class="text-sm text-gray-600"><strong>Bagages :</strong> <span id="summary-luggage">–</span></p>
+                        </div>
+        
+                        <div class="space-y-3">
+                            <h3 class="font-semibold text-gray-800 mb-2">Véhicule & client</h3>
+                            <p class="text-sm text-gray-600"><strong>Véhicule :</strong> <span id="summary-vehicle">–</span></p>
+                            <p class="text-sm text-gray-600"><strong>Prix estimé :</strong> <span id="summary-total">À calculer</span></p>
+                            <p class="text-sm text-gray-600"><strong>Client :</strong> <span id="summary-customer">–</span></p>
+                        </div>
+                    </div>
+        
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 text-sm text-blue-900">
+                        En cliquant sur "Confirmer la réservation", vous envoyez votre demande à notre équipe.
+                        Nous vous recontacterons pour confirmer le prix final et le chauffeur.
+                    </div>
+        
+                    <div class="flex items-center mb-6">
+                        <input
+                            type="checkbox"
+                            id="terms"
+                            required
+                            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
+                        >
+                        <label for="terms" class="ml-2 text-sm text-gray-700">
+                            J'ai lu et j'accepte les conditions générales de vente.
+                        </label>
+                    </div>
+        
+                    <div class="flex justify-between">
+                        <button type="button" onclick="prevStep(2)" class="inline-flex items-center px-5 py-3 rounded-xl border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 ripple">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                            </svg>
+                            Retour
+                        </button>
+        
+                        <button
+                            type="submit"
+                            class="inline-flex items-center px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ripple"
+                        >
+                            Confirmer la réservation
+                        </button>
+                    </div>
+                </div>
+            </div>
         </form>
 
     </div>

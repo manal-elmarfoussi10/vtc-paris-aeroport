@@ -35,27 +35,28 @@ class BookingController extends Controller
         $validated = $request->validate([
             'pickup_address'  => 'required|string|max:255',
             'dropoff_address' => 'required|string|max:255',
-            'pickup_time'     => 'required|date',
+            'pickup_datetime' => 'required|date',
             'pax'             => 'required|integer|min:1|max:8',
             'luggage'         => 'required|integer|min:0|max:8',
             'vehicle_class'   => 'required|string',
             'customer_name'   => 'required|string|max:255',
             'child_seat_count'=> 'nullable',
             'meet_greet'      => 'nullable',
+            'notes'           => 'nullable|string',
         ]);
 
         // Very simple example – adapt columns to your Booking model
         $booking = Booking::create([
             'pickup_address'  => $validated['pickup_address'],
             'dropoff_address' => $validated['dropoff_address'],
-            'pickup_time'     => $validated['pickup_time'],
+            'pickup_datetime' => $validated['pickup_datetime'],
             'pax'             => $validated['pax'],
             'luggage'         => $validated['luggage'],
             'vehicle_class'   => $validated['vehicle_class'],
             'customer_name'   => $validated['customer_name'],
             'child_seat_count'=> $request->boolean('child_seat_count'),
             'meet_greet'      => $request->boolean('meet_greet'),
-            // add price / distance if you store them
+            'notes'           => $validated['notes'] ?? null,
         ]);
 
         return redirect()
