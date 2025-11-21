@@ -42,9 +42,11 @@ class Vehicle extends Model
     public function getClassLabelAttribute(): string
     {
         return match($this->class ?? 'sedan') {
-            'sedan' => 'Berline',
+            'sedan' => 'Berline et S Class',
             'business' => 'Business',
-            'van' => 'Van',
+            'van' => 'Van et V Class',
+            'eco' => 'Eco',
+            'electric' => 'Électrique',
             default => $this->class,
         };
     }

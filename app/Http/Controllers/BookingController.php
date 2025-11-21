@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 
 class BookingController extends Controller
@@ -164,7 +165,7 @@ class BookingController extends Controller
     }
 
     /**
-     * Calculate estimated price (simplified version for v1)
+     * Calculate estimated price using actual distance from Google Distance Matrix API
      */
     private function calculatePriceEstimate(array $data, Vehicle $vehicle): float
     {
@@ -172,11 +173,33 @@ class BookingController extends Controller
         $perKm = $vehicle->per_km ?? 1.50;
         $perMinute = $vehicle->per_min ?? 0.50;
 
-        // Simplified calculation - in production, use actual distance/time
-        $estimatedKm = 25; // placeholder
-        $estimatedMinutes = 45; // placeholder
+        // Get actual distance and duration from the API
+        $distanceKm = 0;
+        $durationMinutes = 0;
 
-        $price = $baseRate + ($estimatedKm * $perKm) + ($estimatedMinutes * $perMinute);
+        if (isset($data['pickup_lat'], $data['pickup_lng'], $data['dropoff_lat'], $data['dropoff_lng'])) {
+            try {
+                $response = $this->getDistanceData($data['pickup_lat'], $data['pickup_lng'], $data['dropoff_lat'], $data['dropoff_lng']);
+                if ($response && $response['success']) {
+                    $distanceKm = $response['data']['distance_value'] / 1000; // Convert meters to km
+                    $durationMinutes = $response['data']['duration_value'] / 60; // Convert seconds to minutes
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to get distance data for price calculation', [
+                    'error' => $e->getMessage(),
+                    'data' => $data
+                ]);
+                // Fall back to estimated values
+                $distanceKm = 25;
+                $durationMinutes = 45;
+            }
+        } else {
+            // Fallback for cases where coordinates aren't available
+            $distanceKm = 25;
+            $durationMinutes = 45;
+        }
+
+        $price = $baseRate + ($distanceKm * $perKm) + ($durationMinutes * $perMinute);
 
         // Add extras
         if (($data['child_seat_count'] ?? 0) > 0) {
@@ -188,6 +211,95 @@ class BookingController extends Controller
         }
 
         return round($price, 2);
+    }
+
+    /**
+     * Get distance data from Google Distance Matrix API
+     */
+    private function getDistanceData(float $originLat, float $originLng, float $destinationLat, float $destinationLng): ?array
+    {
+        $origin = $originLat . ',' . $originLng;
+        $destination = $destinationLat . ',' . $destinationLng;
+
+        $apiKey = env('GOOGLE_MAP_KEY');
+        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json';
+
+        $response = Http::get($url, [
+            'origins' => $origin,
+            'destinations' => $destination,
+            'key' => $apiKey,
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            if (isset($data['rows'][0]['elements'][0]['status']) && $data['rows'][0]['elements'][0]['status'] === 'OK') {
+                return [
+                    "success" => true,
+                    "message" => "success",
+                    "data" => [
+                        'distance_text' => $data['rows'][0]['elements'][0]['distance']['text'],
+                        'distance_value' => $data['rows'][0]['elements'][0]['distance']['value'],
+                        'duration_text' => $data['rows'][0]['elements'][0]['duration']['text'],
+                        'duration_value' => $data['rows'][0]['elements'][0]['duration']['value']
+                    ]
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Calculate distance and duration using Google Distance Matrix API
+     */
+    public function showDistance(Request $request)
+    {
+        $request->validate([
+            'origin_lat' => 'required|numeric|between:-90,90',
+            'origin_lng' => 'required|numeric|between:-180,180',
+            'destination_lat' => 'required|numeric|between:-90,90',
+            'destination_lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        $originLat = $request->origin_lat;
+        $originLng = $request->origin_lng;
+        $destinationLat = $request->destination_lat;
+        $destinationLng = $request->destination_lng;
+
+        $origin = $originLat . ',' . $originLng;
+        $destination = $destinationLat . ',' . $destinationLng;
+
+        $apiKey = env('GOOGLE_MAP_KEY');
+        $url = 'https://maps.googleapis.com/maps/api/distancematrix/json';
+
+        $response = Http::get($url, [
+            'origins' => $origin,
+            'destinations' => $destination,
+            'key' => $apiKey,
+        ]);
+
+        if ($response->successful()) {
+            $data = $response->json();
+
+            if (isset($data['rows'][0]['elements'][0]['status']) && $data['rows'][0]['elements'][0]['status'] === 'OK') {
+                return response()->json([
+                    "success" => true,
+                    "message" => "success",
+                    "data" => [
+                        'distance_text' => $data['rows'][0]['elements'][0]['distance']['text'],
+                        'distance_value' => $data['rows'][0]['elements'][0]['distance']['value'],
+                        'duration_text' => $data['rows'][0]['elements'][0]['duration']['text'],
+                        'duration_value' => $data['rows'][0]['elements'][0]['duration']['value']
+                    ]
+                ]);
+            }
+        }
+
+        return response()->json([
+            "success" => false,
+            'error' => 'Could not fetch distance.'
+        ]);
     }
 
     /**

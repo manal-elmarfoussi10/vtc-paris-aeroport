@@ -4,6 +4,13 @@
 @section('description', 'Réservez votre chauffeur privé pour les aéroports CDG, Orly et Beauvais. Tarifs fixes, service premium 24h/24.')
 
 @section('head')
+<script src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"></script>
+@endsection
+
+@section('content')
+@endsection
+
+@section('head')
 <style>
 /* Modern Booking Page Styles - Enhanced */
 @keyframes fadeInUp {
@@ -1276,6 +1283,8 @@ button:hover::before {
                                     :value="old('pickup_address')"
                                     placeholder="Ex: 123 Avenue des Champs-Élysées, Paris"
                                     required />
+                                <input type="hidden" name="pickup_lat" id="pickup_lat" :value="old('pickup_lat')" />
+                                <input type="hidden" name="pickup_lng" id="pickup_lng" :value="old('pickup_lng')" />
                                 <div class="absolute left-4 top-1/2 transform -translate-y-1/2">
                                     <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -1371,13 +1380,8 @@ button:hover::before {
                         </div>
                     </div>
 
-                    {{-- Map --}}
+                    {{-- Route Info Cards --}}
                     <div class="animate-slide-in-right space-y-6">
-                        <div class="map-container">
-                            <div id="map" class="w-full h-80 rounded-2xl"></div>
-                        </div>
-
-                        {{-- Route Info Cards --}}
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
                                 <div class="flex items-center justify-between">
@@ -1813,11 +1817,6 @@ button:hover::before {
 
 @section('scripts')
 <script>
-let map;
-let directionsService;
-let directionsRenderer;
-let pickupMarker;
-let dropoffMarker;
 let currentDistance = 0;
 let currentDuration = 0;
 let currentStep = 1;
@@ -2004,19 +2003,7 @@ function smoothScrollToStep(stepNumber) {
 }
 
 function initMap() {
-    // Initialize map
-    map = new google.maps.Map(document.getElementById('map'), {
-        center: { lat: 48.8566, lng: 2.3522 }, // Paris
-        zoom: 10,
-    });
-
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({
-        suppressMarkers: true // We'll add custom markers
-    });
-    directionsRenderer.setMap(map);
-
-    // Initialize autocomplete for addresses
+    // Initialize autocomplete for addresses using Google Places API
     const pickupInput = document.getElementById('pickup_address');
     const dropoffInput = document.getElementById('dropoff_address');
 
@@ -2034,7 +2021,7 @@ function initMap() {
         const place = pickupAutocomplete.getPlace();
         if (place.geometry) {
             pickupInput.value = place.formatted_address;
-            updateRoute();
+            updateDistance();
         }
     });
 
@@ -2042,19 +2029,19 @@ function initMap() {
         const place = dropoffAutocomplete.getPlace();
         if (place.geometry) {
             dropoffInput.value = place.formatted_address;
-            updateRoute();
+            updateDistance();
         }
     });
 
-    // Update route on input change (with debounce)
-    let routeTimeout;
-    function debouncedUpdateRoute() {
-        clearTimeout(routeTimeout);
-        routeTimeout = setTimeout(updateRoute, 1000);
+    // Update distance on input change (with debounce)
+    let distanceTimeout;
+    function debouncedUpdateDistance() {
+        clearTimeout(distanceTimeout);
+        distanceTimeout = setTimeout(updateDistance, 1000);
     }
 
-    pickupInput.addEventListener('input', debouncedUpdateRoute);
-    dropoffInput.addEventListener('input', debouncedUpdateRoute);
+    pickupInput.addEventListener('input', debouncedUpdateDistance);
+    dropoffInput.addEventListener('input', debouncedUpdateDistance);
 
     // Update price on form changes
     const form = document.getElementById('booking-form');
