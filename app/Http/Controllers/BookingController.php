@@ -23,6 +23,13 @@ class BookingController extends Controller
         return view('booking.index', compact('vehicles'));
     }
 
+    public function create()
+    {
+        $vehicles = Vehicle::where('is_active', true)->orderBy('sort_order')->get();
+
+        return view('booking.create', compact('vehicles'));
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

@@ -25,6 +25,7 @@ Route::view('/', 'home.index')->name('home');
 
 // booking page (NO login required)
 Route::get('/booking', [BookingController::class, 'index'])->name('booking');
+Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 
 // public AJAX endpoint for distance
