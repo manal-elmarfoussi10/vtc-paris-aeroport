@@ -631,13 +631,49 @@ button:active {
                                     id="pickup_address"
                                     name="pickup_address"
                                     class="w-full form-input-modern"
-                                    placeholder="Ex : 10 Rue de Rivoli, 75001 Paris"
+                                    placeholder="Ex : 10 Rue de Rivoli, 75001 Paris ou Aéroport CDG Terminal 2E"
                                     value="{{ old('pickup_address') }}"
                                     required
                                 >
                                 {{-- hidden lat/lng --}}
                                 <input type="hidden" id="pickup_lat" name="pickup_lat" value="{{ old('pickup_lat') }}">
                                 <input type="hidden" id="pickup_lng" name="pickup_lng" value="{{ old('pickup_lng') }}">
+
+                                {{-- Extra manual fields --}}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                    <div>
+                                        <label class="text-xs text-gray-600 mb-1 block">Code postal *</label>
+                                        <input
+                                            type="text"
+                                            id="pickup_postal"
+                                            name="pickup_postal"
+                                            class="form-input-modern"
+                                            value="{{ old('pickup_postal') }}"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-600 mb-1 block">Ville *</label>
+                                        <input
+                                            type="text"
+                                            id="pickup_city"
+                                            name="pickup_city"
+                                            class="form-input-modern"
+                                            value="{{ old('pickup_city') }}"
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <label class="text-xs text-gray-600 mb-1 block">Lieu / point de repère (optionnel)</label>
+                                    <input
+                                        type="text"
+                                        id="pickup_note"
+                                        name="pickup_note"
+                                        class="form-input-modern"
+                                        value="{{ old('pickup_note') }}"
+                                        placeholder="Immeuble, porte, hôtel, etc."
+                                    >
+                                </div>
 
                                 @error('pickup_address')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -654,13 +690,49 @@ button:active {
                                     id="dropoff_address"
                                     name="dropoff_address"
                                     class="w-full form-input-modern"
-                                    placeholder="Ex : Aéroport CDG, Terminal 2E"
+                                    placeholder="Ex : Hôtel Pullman Tour Eiffel ou Aéroport Orly Terminal 1"
                                     value="{{ old('dropoff_address') }}"
                                     required
                                 >
                                 {{-- hidden lat/lng --}}
                                 <input type="hidden" id="dropoff_lat" name="dropoff_lat" value="{{ old('dropoff_lat') }}">
                                 <input type="hidden" id="dropoff_lng" name="dropoff_lng" value="{{ old('dropoff_lng') }}">
+
+                                {{-- Extra manual fields --}}
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                    <div>
+                                        <label class="text-xs text-gray-600 mb-1 block">Code postal *</label>
+                                        <input
+                                            type="text"
+                                            id="dropoff_postal"
+                                            name="dropoff_postal"
+                                            class="form-input-modern"
+                                            value="{{ old('dropoff_postal') }}"
+                                        >
+                                    </div>
+                                    <div>
+                                        <label class="text-xs text-gray-600 mb-1 block">Ville *</label>
+                                        <input
+                                            type="text"
+                                            id="dropoff_city"
+                                            name="dropoff_city"
+                                            class="form-input-modern"
+                                            value="{{ old('dropoff_city') }}"
+                                        >
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <label class="text-xs text-gray-600 mb-1 block">Lieu / point de repère (optionnel)</label>
+                                    <input
+                                        type="text"
+                                        id="dropoff_note"
+                                        name="dropoff_note"
+                                        class="form-input-modern"
+                                        value="{{ old('dropoff_note') }}"
+                                        placeholder="Hôtel, terminal, gare, etc."
+                                    >
+                                </div>
 
                                 @error('dropoff_address')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -814,7 +886,7 @@ button:active {
                             @enderror
                         </div>
 
-                        {{-- Options / coordonnées / prix (identique à ton code) --}}
+                        {{-- Options / coordonnées / prix --}}
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div class="space-y-2">
                                 <h3 class="text-lg font-semibold">Options supplémentaires</h3>
@@ -877,6 +949,24 @@ button:active {
                                         placeholder="+33 6 12 34 56 78"
                                         value="{{ old('customer_phone') }}"
                                     >
+                                </div>
+
+                                <div>
+                                    <label for="customer_email" class="block text-sm font-medium text-gray-700 mb-1">
+                                        Email *
+                                    </label>
+                                    <input
+                                        type="email"
+                                        id="customer_email"
+                                        name="customer_email"
+                                        class="w-full form-input-modern"
+                                        placeholder="exemple@email.com"
+                                        value="{{ old('customer_email') }}"
+                                        required
+                                    >
+                                    @error('customer_email')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -1026,7 +1116,8 @@ function initMap() {
     const dropoffInput = document.getElementById('dropoff_address');
 
     const options = {
-        types: ['geocode'],
+        fields: ["address_components", "geometry", "formatted_address", "name"],
+        types: ["geocode", "establishment"], // addresses + airports + gares + hôtels + POI
         componentRestrictions: { country: 'fr' },
     };
 
@@ -1047,6 +1138,30 @@ function initMap() {
     }
 }
 
+/** Auto-fill postal & city fields from place components */
+function fillExtraAddressFields(place, type) {
+    let postal = "";
+    let city   = "";
+
+    if (place.address_components) {
+        place.address_components.forEach(component => {
+            const types = component.types || [];
+            if (types.includes("postal_code")) {
+                postal = component.long_name;
+            }
+            if (types.includes("locality") || types.includes("postal_town")) {
+                city = component.long_name;
+            }
+        });
+    }
+
+    const postalInput = document.getElementById(type + '_postal');
+    const cityInput   = document.getElementById(type + '_city');
+
+    if (postalInput && !postalInput.value) postalInput.value = postal;
+    if (cityInput   && !cityInput.value)   cityInput.value   = city;
+}
+
 function handlePlaceSelected(place, type) {
     if (!place.geometry || !place.geometry.location) {
         alert("Adresse introuvable, merci de choisir une suggestion.");
@@ -1060,6 +1175,9 @@ function handlePlaceSelected(place, type) {
     const lngInput = document.getElementById(type + '_lng');
     if (latInput) latInput.value = lat;
     if (lngInput) lngInput.value = lng;
+
+    // Fill city + postal
+    fillExtraAddressFields(place, type);
 
     const position = { lat, lng };
 
