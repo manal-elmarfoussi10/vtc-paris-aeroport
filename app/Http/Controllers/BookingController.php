@@ -257,9 +257,14 @@ class BookingController extends Controller
 
             if (! $response->successful()) {
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Erreur API Google.',
-                ], 500);
+                    'success' => true,
+                    'data'    => [
+                        'distance_text'  => '0 km',
+                        'distance_value' => 0,
+                        'duration_text'  => '0 min',
+                        'duration_value' => 0,
+                    ],
+                ]);
             }
 
             $data = $response->json();
@@ -269,9 +274,14 @@ class BookingController extends Controller
                 $data['rows'][0]['elements'][0]['status'] === 'ZERO_RESULTS'
             ) {
                 return response()->json([
-                    'success' => false,
-                    'message' => 'Trajet introuvable.',
-                ], 422);
+                    'success' => true,
+                    'data'    => [
+                        'distance_text'  => '0 km',
+                        'distance_value' => 0,
+                        'duration_text'  => '0 min',
+                        'duration_value' => 0,
+                    ],
+                ]);
             }
 
             $element = $data['rows'][0]['elements'][0];
@@ -287,9 +297,14 @@ class BookingController extends Controller
             ]);
         } catch (\Throwable $e) {
             return response()->json([
-                'success' => false,
-                'message' => 'Erreur de calcul de distance.',
-            ], 500);
+                'success' => true,
+                'data'    => [
+                    'distance_text'  => '0 km',
+                    'distance_value' => 0,
+                    'duration_text'  => '0 min',
+                    'duration_value' => 0,
+                ],
+            ]);
         }
     }
 

@@ -41,9 +41,8 @@ class Vehicle extends Model
      */
     public function getClassLabelAttribute(): string
     {
-        return match($this->class ?? 'sedan') {
-            'sedan' => 'Berline et S Class',
-            'business' => 'Business',
+        return match($this->class ?? 'berline') {
+            'berline' => 'Berline et S Class',
             'van' => 'Van et V Class',
             'eco' => 'Eco',
             'electric' => 'Électrique',
@@ -60,19 +59,11 @@ class Vehicle extends Model
     }
 
     /**
-     * Scope a query to only include sedan vehicles
+     * Scope a query to only include berline vehicles
      */
-    public function scopeSedan($query)
+    public function scopeBerline($query)
     {
-        return $query->where('class', 'sedan');
-    }
-
-    /**
-     * Scope a query to only include business vehicles
-     */
-    public function scopeBusiness($query)
-    {
-        return $query->where('class', 'business');
+        return $query->where('class', 'berline');
     }
 
     /**
@@ -81,5 +72,21 @@ class Vehicle extends Model
     public function scopeVan($query)
     {
         return $query->where('class', 'van');
+    }
+
+    /**
+     * Scope a query to only include eco vehicles
+     */
+    public function scopeEco($query)
+    {
+        return $query->where('class', 'eco');
+    }
+
+    /**
+     * Scope a query to only include electric vehicles
+     */
+    public function scopeElectric($query)
+    {
+        return $query->where('class', 'electric');
     }
 }

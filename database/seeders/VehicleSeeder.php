@@ -9,67 +9,63 @@ class VehicleSeeder extends Seeder
 {
     public function run(): void
     {
-        $vehicles = [
-            [
-                'slug' => 'eco-range',
-                'name' => 'Gamme Eco',
-                'class' => 'eco',
-                'capacity_pax' => 4,
-                'capacity_luggage' => 2,
-                'base_rate' => 35.00,
-                'per_km' => 1.80,
-                'per_min' => 0.50,
-                'is_active' => true,
-                'sort_order' => 1,
-                'description' => 'Véhicules économiques pour déplacements quotidiens.',
-            ],
-            [
-                'slug' => 'berline-s-class',
-                'name' => 'Berline et S Class',
-                'class' => 'sedan',
-                'capacity_pax' => 3,
-                'capacity_luggage' => 2,
-                'base_rate' => 55.00,
-                'per_km' => 2.20,
-                'per_min' => 0.70,
-                'is_active' => true,
-                'sort_order' => 2,
-                'description' => 'Mercedes Classe E, BMW Série 5 ou équivalent. Idéal pour vos déplacements professionnels et transferts aéroports.',
-            ],
-            [
-                'slug' => 'van-v-class',
-                'name' => 'Van et V Class',
-                'class' => 'van',
-                'capacity_pax' => 7,
-                'capacity_luggage' => 8,
-                'base_rate' => 65.00,
-                'per_km' => 2.75,
-                'per_min' => 0.80,
-                'is_active' => true,
-                'sort_order' => 3,
-                'description' => 'Mercedes Classe V ou équivalent. Parfait pour les groupes et familles avec bagages volumineux.',
-            ],
-            [
-                'slug' => 'electrique',
-                'name' => 'Gamme Électrique',
-                'class' => 'electric',
-                'capacity_pax' => 4,
-                'capacity_luggage' => 2,
-                'base_rate' => 50.00,
-                'per_km' => 1.90,
-                'per_min' => 0.60,
-                'is_active' => true,
-                'sort_order' => 4,
-                'description' => 'Véhicules électriques écologiques pour un transport durable.',
-            ],
-        ];
+        Vehicle::truncate();
 
-        foreach ($vehicles as $vehicle) {
-            Vehicle::updateOrCreate(
-                ['slug' => $vehicle['slug']],
-                $vehicle
-            );
-        }
+        Vehicle::create([
+            'slug'             => 'eco-standard',
+            'name'             => 'Gamme Eco',
+            'class'            => 'eco',
+            'capacity_pax'     => 3,
+            'capacity_luggage' => 2,
+            'base_rate'        => 35.00,   // 35€ minimum
+            'per_km'           => 1.80,    // 1,80€/km
+            'per_min'          => 0.00,
+            'description'      => 'Solution économique pour les trajets du quotidien.',
+            'is_active'        => true,
+            'sort_order'       => 1,
+        ]);
+
+        Vehicle::create([
+            'slug'             => 'berline-business',
+            'name'             => 'Gamme Berline & S Class',
+            'class'            => 'berline',
+            'capacity_pax'     => 3,
+            'capacity_luggage' => 3,
+            'base_rate'        => 55.00,   // 55€ minimum
+            'per_km'           => 2.20,    // 2,20€/km
+            'per_min'          => 0.00,
+            'description'      => 'Berlines confort et Mercedes Classe S ou équivalent.',
+            'is_active'        => true,
+            'sort_order'       => 2,
+        ]);
+
+        Vehicle::create([
+            'slug'             => 'van-familial',
+            'name'             => 'Gamme Van & V Class',
+            'class'            => 'van',
+            'capacity_pax'     => 7,
+            'capacity_luggage' => 8,
+            'base_rate'        => 65.00,   // 65€ minimum
+            'per_km'           => 2.75,    // 2,75€/km
+            'per_min'          => 0.00,
+            'description'      => 'Vans haut de gamme pour familles et groupes.',
+            'is_active'        => true,
+            'sort_order'       => 3,
+        ]);
+
+        Vehicle::create([
+            'slug'             => 'electric-premium',
+            'name'             => 'Gamme Électrique',
+            'class'            => 'electric',
+            'capacity_pax'     => 3,
+            'capacity_luggage' => 2,
+            'base_rate'        => 50.00,   // 50€ minimum
+            'per_km'           => 1.90,    // 1,90€/km
+            'per_min'          => 0.00,
+            'description'      => 'Véhicules 100% électriques premium.',
+            'is_active'        => true,
+            'sort_order'       => 4,
+        ]);
 
         $this->command->info('Vehicles seeded successfully!');
     }
