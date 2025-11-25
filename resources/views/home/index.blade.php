@@ -995,8 +995,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="flex items-center">
                             <img class="w-10 h-10 rounded-full mr-3" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face" alt="Marie Dubois">
                             <div>
-                                <div class="font-semibold text-gray-900">Marie Dubois</div>
-                                <div class="text-sm text-gray-600">CEO, Tech Startup</div>
+                        <div class="font-semibold text-gray-900">Lucas Dubois</div>
+                        <div class="text-sm text-gray-600">CEO, Tech Startup</div>
                             </div>
                         </div>
                     </div>
