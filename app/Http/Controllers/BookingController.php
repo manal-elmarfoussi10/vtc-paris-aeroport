@@ -68,6 +68,12 @@ class BookingController extends Controller
             'notes'            => 'nullable|string',
         ]);
 
+        // Find the vehicle by class
+        $vehicle = Vehicle::where('class', $validated['vehicle_class'])->first();
+
+        // Calculate price estimate
+        $price = $vehicle ? $this->calculatePriceEstimate($validated, $vehicle) : 0;
+
         $booking = Booking::create([
             // Trajet
             'pickup_address'   => $validated['pickup_address'],
@@ -90,6 +96,7 @@ class BookingController extends Controller
 
             // Véhicule
             'vehicle_class'    => $validated['vehicle_class'],
+            'vehicle_id'       => $vehicle ? $vehicle->id : null,
 
             // Client
             'customer_name'    => $validated['customer_name'],
@@ -102,10 +109,13 @@ class BookingController extends Controller
 
             // Commentaires
             'notes'            => $validated['notes'] ?? null,
+
+            // Pricing
+            'price'            => $price,
         ]);
 
-        // Optionnel : envoyer un mail de confirmation
-        // $this->sendBookingConfirmation($booking);
+        // Send booking confirmation email
+        $this->sendBookingConfirmation($booking);
 
         return redirect()
             ->route('booking')
@@ -284,14 +294,19 @@ class BookingController extends Controller
     }
 
     /**
-     * Send booking confirmation (placeholder)
+     * Send booking confirmation email
      */
     private function sendBookingConfirmation(Booking $booking): void
     {
-        // TODO: Implement email sending
-        Log::info('Booking confirmation email would be sent', [
-            'booking_id' => $booking->id,
-            'email'      => $booking->customer_email,
-        ]);
+        try {
+            \Mail::to($booking->customer_email)->send(new \App\Mail\BookingConfirmation($booking));
+            // Optionally, send notification email to contact email
+            \Mail::to(config('mail.from.address'))->send(new \App\Mail\BookingConfirmation($booking));
+        } catch (\Exception $e) {
+            \Log::error('Failed to send booking confirmation email: ' . $e->getMessage(), [
+                'booking_id' => $booking->id,
+                'email'      => $booking->customer_email,
+            ]);
+        }
     }
 }
