@@ -20,7 +20,7 @@ class VehicleSeeder extends Seeder
             'base_rate'        => 35.00,   // 35€ minimum
             'per_km'           => 1.80,    // 1,80€/km
             'per_min'          => 0.00,
-            'description'      => 'Solution économique pour les trajets du quotidien.',
+            'description'      => 'Gamme Eco 1,80€/km – 35€ minimum',
             'is_active'        => true,
             'sort_order'       => 1,
         ]);
@@ -34,7 +34,7 @@ class VehicleSeeder extends Seeder
             'base_rate'        => 55.00,   // 55€ minimum
             'per_km'           => 2.20,    // 2,20€/km
             'per_min'          => 0.00,
-            'description'      => 'Berlines confort et Mercedes Classe S ou équivalent.',
+            'description'      => 'Gamme Berline et S Class 2,20€/km – 55€ minimum',
             'is_active'        => true,
             'sort_order'       => 2,
         ]);
@@ -62,7 +62,7 @@ class VehicleSeeder extends Seeder
             'base_rate'        => 50.00,   // 50€ minimum
             'per_km'           => 1.90,    // 1,90€/km
             'per_min'          => 0.00,
-            'description'      => 'Véhicules 100% électriques premium.',
+            'description'      => 'Gamme Électrique 1,90€/km – 50€ minimum',
             'is_active'        => true,
             'sort_order'       => 4,
         ]);

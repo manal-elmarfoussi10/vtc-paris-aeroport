@@ -1326,6 +1326,8 @@ async function updateDistance() {
     if (!pickup || !dropoff) {
         currentDistance = 0;
         currentDuration = 0;
+        document.getElementById('distance-display').textContent = '–';
+        document.getElementById('duration-display').textContent = '–';
         updatePrice();
         return;
     }
@@ -1353,11 +1355,15 @@ async function updateDistance() {
         } else {
             currentDistance = 0;
             currentDuration = 0;
+            document.getElementById('distance-display').textContent = '0 km';
+            document.getElementById('duration-display').textContent = '0 min';
         }
     } catch (e) {
         console.error(e);
         currentDistance = 0;
         currentDuration = 0;
+        document.getElementById('distance-display').textContent = '0 km';
+        document.getElementById('duration-display').textContent = '0 min';
     }
 
     updatePrice();
@@ -1436,8 +1442,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const pickup  = document.getElementById('pickup_address');
     const dropoff = document.getElementById('dropoff_address');
 
-    if (pickup)  pickup.addEventListener('input', scheduleDistanceUpdate);
-    if (dropoff) dropoff.addEventListener('input', scheduleDistanceUpdate);
+    if (pickup) {
+        pickup.addEventListener('input', scheduleDistanceUpdate);
+        pickup.addEventListener('blur', scheduleDistanceUpdate);
+    }
+    if (dropoff) {
+        dropoff.addEventListener('input', scheduleDistanceUpdate);
+        dropoff.addEventListener('blur', scheduleDistanceUpdate);
+    }
 
     const form = document.getElementById('booking-form');
     if (form) {

@@ -270,6 +270,8 @@ class BookingController extends Controller
             $data = $response->json();
 
             if (
+                empty($data['rows']) ||
+                empty($data['rows'][0]['elements']) ||
                 empty($data['rows'][0]['elements'][0]) ||
                 $data['rows'][0]['elements'][0]['status'] === 'ZERO_RESULTS'
             ) {
@@ -285,6 +287,18 @@ class BookingController extends Controller
             }
 
             $element = $data['rows'][0]['elements'][0];
+
+            if ($element['status'] !== 'OK') {
+                return response()->json([
+                    'success' => true,
+                    'data'    => [
+                        'distance_text'  => '0 km',
+                        'distance_value' => 0,
+                        'duration_text'  => '0 min',
+                        'duration_value' => 0,
+                    ],
+                ]);
+            }
 
             return response()->json([
                 'success' => true,
