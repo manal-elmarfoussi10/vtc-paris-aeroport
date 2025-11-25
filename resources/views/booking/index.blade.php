@@ -552,14 +552,7 @@ button:active {
     font-weight: bold;
     animation: success-bounce 1s ease-out, bounceIn 0.6s ease-out;
 }
-
-/* (media queries and other styles you had – keep them the same) */
-/* ... I shortened here to keep the answer readable, but in your file keep ALL the CSS you pasted before ... */
-
-{{-- Google Maps JS with Places --}}
-<script
-    src="https://maps.googleapis.com/maps/api/js?key={{ env('GOOGLE_MAPS_API_KEY') }}&libraries=places&callback=initMap"
-    async defer></script>
+</style>
 
 @endsection
 @section('content')
@@ -1004,6 +997,7 @@ button:active {
 @endsection
 
 @section('scripts')
+
 <script>
 let map;
 let pickupAutocomplete, dropoffAutocomplete;
@@ -1013,7 +1007,9 @@ let currentDistance = 0; // km
 let currentDuration = 0; // minutes
 let currentStep     = 1;
 
-/* ========== MAP + AUTOCOMPLETE ========== */
+/* ============================================================
+   ===============   MAP + AUTOCOMPLETE   =====================
+   ============================================================ */
 function initMap() {
     const mapEl = document.getElementById('map');
     if (!mapEl) return;
@@ -1105,15 +1101,18 @@ function fitMapBounds() {
     }
 }
 
-/* expose for callback parameter */
+/* Expose for Google callback */
 window.initMap = initMap;
 
-/* ========== GENERAL UI HELPERS ========== */
+/* ============================================================
+   =================  UI HELPERS  ==============================
+   ============================================================ */
+
 function scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* Confirmation (step 3) */
+/* Confirmation Step */
 function updateBookingSummary() {
     const pickup   = document.getElementById('pickup_address')?.value || '';
     const dropoff  = document.getElementById('dropoff_address')?.value || '';
@@ -1140,15 +1139,18 @@ function updateBookingSummary() {
         document.getElementById('price-estimate')?.textContent || 'À calculer';
 }
 
-/* Step navigation */
+/* ============================================================
+   ==================  STEPS / VALIDATION  ====================
+   ============================================================ */
+
 function nextStep(step) {
-    if (validateCurrentStep()) {
-        showStep(step);
-    }
+    if (validateCurrentStep()) showStep(step);
 }
+
 function prevStep(step) {
     showStep(step);
 }
+
 function showStep(step) {
     document.querySelectorAll('.step-transition').forEach(el => el.classList.add('hidden'));
 
@@ -1181,7 +1183,9 @@ function validateCurrentStep() {
             ok = false;
             alert('Veuillez remplir tous les champs obligatoires.');
         }
-    } else if (currentStep === 2) {
+    }
+
+    else if (currentStep === 2) {
         const luggage = document.getElementById('luggage').value;
         const vehicle = document.querySelector('input[name="vehicle_class"]:checked');
         if (!luggage || !vehicle) {
@@ -1193,7 +1197,10 @@ function validateCurrentStep() {
     return ok;
 }
 
-/* ========== DISTANCE VIA YOUR LARAVEL ROUTE ========== */
+/* ============================================================
+   ================= DISTANCE (AJAX → Laravel) ===============
+   ============================================================ */
+
 async function updateDistance() {
     const pickup  = document.getElementById('pickup_address').value.trim();
     const dropoff = document.getElementById('dropoff_address').value.trim();
@@ -1243,7 +1250,10 @@ function scheduleDistanceUpdate() {
     distanceTimeout = setTimeout(updateDistance, 600);
 }
 
-/* ========== PRICE ========== */
+/* ============================================================
+   ==================== PRICE CALCULATION =====================
+   ============================================================ */
+
 function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
     const vehicleClass    = selectedVehicle ? selectedVehicle.value : null;
@@ -1252,6 +1262,7 @@ function updatePrice() {
     const meetGreet = document.querySelector('input[name="meet_greet"]')?.checked ?? false;
 
     let basePrice = 0, perKm = 0;
+
     switch (vehicleClass) {
         case 'business':
             basePrice = 80; perKm = 2.0; break;
@@ -1263,6 +1274,7 @@ function updatePrice() {
     }
 
     let total = basePrice;
+
     if (currentDistance > 0) total += currentDistance * perKm;
     if (childSeat) total += 15;
     if (meetGreet) total += 10;
@@ -1275,12 +1287,17 @@ function updatePrice() {
 function selectVehicle(vehicleClass, el) {
     document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
     el.classList.add('selected');
+
     const radio = el.querySelector('.vehicle-radio');
     if (radio) radio.checked = true;
+
     updatePrice();
 }
 
-/* ========== DOM READY ========== */
+/* ============================================================
+   ===================== DOM READY =============================
+   ============================================================ */
+
 document.addEventListener('DOMContentLoaded', () => {
     const pickup  = document.getElementById('pickup_address');
     const dropoff = document.getElementById('dropoff_address');
@@ -1295,10 +1312,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/* expose functions used in HTML */
-window.nextStep = nextStep;
-window.prevStep = prevStep;
-window.selectVehicle = selectVehicle;
-window.scrollToTop = scrollToTop;
+/* Expose functions globally */
+window.nextStep       = nextStep;
+window.prevStep       = prevStep;
+window.selectVehicle  = selectVehicle;
+window.scrollToTop    = scrollToTop;
+
 </script>
+
+{{-- ============================================================
+     LOAD GOOGLE MAPS (AFTER all JS ABOVE)
+   ============================================================ --}}
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key') }}&libraries=places&callback=initMap"
+    async defer>
+</script>
+
 @endsection

@@ -94,7 +94,7 @@ class BookingController extends Controller
         $origin      = $data['pickup_address'];
         $destination = $data['dropoff_address'];
 
-        $apiKey = env('GOOGLE_MAPS_API_KEY');
+        $apiKey = config('services.google.maps_key');
         $url    = 'https://maps.googleapis.com/maps/api/distancematrix/json';
 
         $response = Http::get($url, [
@@ -145,7 +145,7 @@ class BookingController extends Controller
         $origin = $originLat . ',' . $originLng;
         $destination = $destinationLat . ',' . $destinationLng;
 
-        $apiKey = env('GOOGLE_MAP_KEY');
+        $apiKey = config('services.google.maps_key');
         $url = 'https://maps.googleapis.com/maps/api/distancematrix/json';
 
         $response = Http::get($url, [
@@ -207,7 +207,7 @@ class BookingController extends Controller
 
             if (
                 empty($data['rows'][0]['elements'][0]) ||
-                $data['rows'][0]['elements[0]']['status'] === 'ZERO_RESULTS'
+                $data['rows'][0]['elements'][0]['status'] === 'ZERO_RESULTS'
             ) {
                 return response()->json([
                     'success' => false,
