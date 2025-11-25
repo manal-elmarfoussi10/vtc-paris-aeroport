@@ -1041,7 +1041,10 @@ button:active {
                         <div class="space-y-3">
                             <h3 class="font-semibold text-gray-800 mb-2">Véhicule & client</h3>
                             <p class="text-sm text-gray-600"><strong>Véhicule :</strong> <span id="summary-vehicle">–</span></p>
-                            <p class="text-sm text-gray-600"><strong>Prix estimé :</strong> <span id="summary-total">À calculer</span></p>
+                            <p class="text-sm text-gray-600">
+                                <strong>Prix estimé :</strong>
+                                <span id="summary-total-price">À calculer</span>
+                            </p>
                             <p class="text-sm text-gray-600"><strong>Client :</strong> <span id="summary-customer">–</span></p>
                         </div>
                     </div>
@@ -1253,7 +1256,8 @@ function updateBookingSummary() {
         document.getElementById('summary-vehicle').textContent = name;
     }
 
-    document.getElementById('summary-total').textContent =
+    // copy estimated price from step 2
+    document.getElementById('summary-total-price').textContent =
         document.getElementById('price-estimate')?.textContent || 'À calculer';
 }
 
@@ -1378,7 +1382,7 @@ function scheduleDistanceUpdate() {
    ==================== PRICE CALCULATION =====================
    ============================================================ */
 
-   function updatePrice() {
+function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
     const vehicleClass    = selectedVehicle ? selectedVehicle.value : null;
 
@@ -1469,9 +1473,9 @@ window.scrollToTop    = scrollToTop;
 {{-- ============================================================
      LOAD GOOGLE MAPS (AFTER all JS ABOVE)
    ============================================================ --}}
-   <script
-   src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key', env('GOOGLE_MAPS_API_KEY')) }}&libraries=places&callback=initMap"
-   async defer>
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key', env('GOOGLE_MAPS_API_KEY')) }}&libraries=places&callback=initMap"
+    async defer>
 </script>
 
 @endsection

@@ -3,33 +3,42 @@
 namespace App\Http\Controllers;
 
 use App\Models\Booking;
-use App\Models\Customer;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Http;
-use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    /**
+     * Show booking page (single-page flow with steps 1–3)
+     */
     public function index()
     {
-        // adapt filters to your schema
-        $vehicles = Vehicle::where('is_active', true)->orderBy('sort_order')->get();
+        $vehicles = Vehicle::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
 
         return view('booking.index', compact('vehicles'));
     }
 
+    /**
+     * (Optional) If you use /booking/create separately
+     */
     public function create()
     {
-        $vehicles = Vehicle::where('is_active', true)->orderBy('sort_order')->get();
+        $vehicles = Vehicle::where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
 
-        return view('booking.create', compact('vehicles'));
+        return view('booking.index', compact('vehicles'));
     }
 
+    /**
+     * Store a new booking from the multi-step form.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -60,7 +69,7 @@ class BookingController extends Controller
             'customer_email'   => 'required|email|max:255',
             'customer_phone'   => 'nullable|string|max:50',
 
-            // Options
+            // Options (checkbox)
             'child_seat_count' => 'nullable',
             'meet_greet'       => 'nullable',
 
@@ -68,10 +77,10 @@ class BookingController extends Controller
             'notes'            => 'nullable|string',
         ]);
 
-        // Find the vehicle by class
+        // Find the vehicle by "class" (eco / berline / van / electric)
         $vehicle = Vehicle::where('class', $validated['vehicle_class'])->first();
 
-        // Calculate price estimate
+        // Calculate price estimate (same logic as JS: per vehicle class + options)
         $price = $vehicle ? $this->calculatePriceEstimate($validated, $vehicle) : 0;
 
         $booking = Booking::create([
@@ -103,7 +112,7 @@ class BookingController extends Controller
             'customer_email'   => $validated['customer_email'],
             'customer_phone'   => $validated['customer_phone'] ?? null,
 
-            // Options
+            // Options (checkbox => bool)
             'child_seat_count' => $request->boolean('child_seat_count'),
             'meet_greet'       => $request->boolean('meet_greet'),
 
@@ -114,18 +123,21 @@ class BookingController extends Controller
             'price'            => $price,
         ]);
 
-        // Send booking confirmation email
+        // Send booking confirmation emails
         $this->sendBookingConfirmation($booking);
 
         return redirect()
-            ->route('booking')
+            ->route('booking') // named route "booking" => BookingController@index
             ->with('status', 'Votre réservation a bien été enregistrée. Nous vous contacterons rapidement.');
     }
 
+    /**
+     * Optional confirmation page if you want /booking/{booking}/confirm
+     */
     public function confirm(Booking $booking)
     {
-        // Ensure user can only see their own bookings
-        if (Auth::check() && $booking->user_id !== Auth::id()) {
+        // Ensure user can only see their own bookings, if you link bookings to users
+        if (Auth::check() && $booking->user_id && $booking->user_id !== Auth::id()) {
             abort(403);
         }
 
@@ -133,28 +145,26 @@ class BookingController extends Controller
     }
 
     /**
-     * Calculate estimated price using actual distance from Google Distance Matrix API
+     * Calculate estimated price using Google Distance Matrix API
+     * Logic aligned with your JS (per vehicle class + min price + options).
      */
     private function calculatePriceEstimate(array $data, Vehicle $vehicle): float
     {
-        $baseRate   = $vehicle->base_rate;
-        $perKm      = $vehicle->per_km ?? 1.50;
-        $perMinute  = $vehicle->per_min ?? 0.50;
-
-        $distanceKm      = 0;
-        $durationMinutes = 0;
+        $distanceKm = 0;
 
         try {
-            // we just use full addresses here
             $origin      = $data['pickup_address'];
             $destination = $data['dropoff_address'];
 
-            $apiKey = config('services.google.maps_key');
+            $apiKey = config('services.google.maps_key', env('GOOGLE_MAPS_API_KEY'));
             $url    = 'https://maps.googleapis.com/maps/api/distancematrix/json';
 
             $response = Http::get($url, [
                 'origins'      => $origin,
                 'destinations' => $destination,
+                'mode'         => 'driving',
+                'units'        => 'metric',
+                'language'     => 'fr',
                 'key'          => $apiKey,
             ]);
 
@@ -165,8 +175,7 @@ class BookingController extends Controller
                     isset($json['rows'][0]['elements'][0]['status']) &&
                     $json['rows'][0]['elements'][0]['status'] === 'OK'
                 ) {
-                    $distanceKm      = $json['rows'][0]['elements'][0]['distance']['value'] / 1000; // m → km
-                    $durationMinutes = $json['rows'][0]['elements'][0]['duration']['value'] / 60;   // s → min
+                    $distanceKm = $json['rows'][0]['elements'][0]['distance']['value'] / 1000; // m → km
                 }
             }
         } catch (\Exception $e) {
@@ -174,67 +183,54 @@ class BookingController extends Controller
                 'error' => $e->getMessage(),
                 'data'  => $data,
             ]);
-            // fallback values
-            $distanceKm      = 25;
-            $durationMinutes = 45;
+            // fallback: you can set a default distance if you want, or leave 0
+            $distanceKm = 0;
         }
 
-        $price = $baseRate + ($distanceKm * $perKm) + ($durationMinutes * $perMinute);
+        // Same tariffs as in JS
+        $rates = [
+            'eco'      => ['perKm' => 1.80, 'minPrice' => 35],
+            'berline'  => ['perKm' => 2.20, 'minPrice' => 55],
+            'van'      => ['perKm' => 2.75, 'minPrice' => 65],
+            'electric' => ['perKm' => 1.90, 'minPrice' => 50],
+        ];
 
-        // Extras
-        if (($data['child_seat_count'] ?? 0) > 0) {
-            $price += ($data['child_seat_count'] * 10);
+        $vehicleClass = $data['vehicle_class'] ?? $vehicle->class;
+
+        if (isset($rates[$vehicleClass])) {
+            $perKm    = $rates[$vehicleClass]['perKm'];
+            $minPrice = $rates[$vehicleClass]['minPrice'];
+        } else {
+            // fallback
+            $perKm    = 1.80;
+            $minPrice = 35;
         }
 
-        if (!empty($data['meet_greet'])) {
-            $price += 15;
-        }
+        $total = 0;
 
-        return round($price, 2);
-    }
+        if ($distanceKm > 0) {
+            $total = $distanceKm * $perKm;
 
-    /**
-     * Get distance data from Google Distance Matrix API (using coords)
-     */
-    private function getDistanceData(float $originLat, float $originLng, float $destinationLat, float $destinationLng): ?array
-    {
-        $origin      = $originLat . ',' . $originLng;
-        $destination = $destinationLat . ',' . $destinationLng;
-
-        $apiKey = config('services.google.maps_key');
-        $url    = 'https://maps.googleapis.com/maps/api/distancematrix/json';
-
-        $response = Http::get($url, [
-            'origins'      => $origin,
-            'destinations' => $destination,
-            'key'          => $apiKey,
-        ]);
-
-        if ($response->successful()) {
-            $data = $response->json();
-
-            if (isset($data['rows'][0]['elements'][0]['status'])
-                && $data['rows'][0]['elements'][0]['status'] === 'OK'
-            ) {
-                return [
-                    "success" => true,
-                    "message" => "success",
-                    "data" => [
-                        'distance_text'   => $data['rows'][0]['elements'][0]['distance']['text'],
-                        'distance_value'  => $data['rows'][0]['elements'][0]['distance']['value'],
-                        'duration_text'   => $data['rows'][0]['elements'][0]['duration']['text'],
-                        'duration_value'  => $data['rows'][0]['elements'][0]['duration']['value'],
-                    ],
-                ];
+            if ($total < $minPrice) {
+                $total = $minPrice;
             }
         }
 
-        return null;
+        // Options (same as JS: +15€ siège enfant, +10€ meet & greet)
+        if (!empty($data['child_seat_count'])) {
+            $total += 15;
+        }
+
+        if (!empty($data['meet_greet'])) {
+            $total += 10;
+        }
+
+        return round($total, 2);
     }
 
     /**
-     * Calculate distance and duration using Google Distance Matrix API
-     * (used by AJAX route booking.distance)
+     * AJAX endpoint used by JS route('booking.distance')
+     * Returns distance + duration for live estimation.
      */
     public function showDistance(Request $request)
     {
@@ -310,6 +306,8 @@ class BookingController extends Controller
                 ],
             ]);
         } catch (\Throwable $e) {
+            Log::error('DistanceMatrix AJAX error', ['error' => $e->getMessage()]);
+
             return response()->json([
                 'success' => true,
                 'data'    => [
@@ -323,16 +321,21 @@ class BookingController extends Controller
     }
 
     /**
-     * Send booking confirmation email
+     * Send booking confirmation email to client + admin.
      */
     private function sendBookingConfirmation(Booking $booking): void
     {
         try {
-            \Mail::to($booking->customer_email)->send(new \App\Mail\BookingConfirmation($booking));
-            // Optionally, send notification email to contact email
-            \Mail::to(config('mail.from.address'))->send(new \App\Mail\BookingConfirmation($booking));
+            Mail::to($booking->customer_email)
+                ->send(new \App\Mail\BookingConfirmation($booking));
+
+            // Optionally send to your admin / from address
+            if (config('mail.from.address')) {
+                Mail::to(config('mail.from.address'))
+                    ->send(new \App\Mail\BookingConfirmation($booking));
+            }
         } catch (\Exception $e) {
-            \Log::error('Failed to send booking confirmation email: ' . $e->getMessage(), [
+            Log::error('Failed to send booking confirmation email: ' . $e->getMessage(), [
                 'booking_id' => $booking->id,
                 'email'      => $booking->customer_email,
             ]);
