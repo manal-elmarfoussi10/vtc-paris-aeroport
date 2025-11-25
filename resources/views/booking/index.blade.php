@@ -1372,28 +1372,44 @@ function scheduleDistanceUpdate() {
    ==================== PRICE CALCULATION =====================
    ============================================================ */
 
-function updatePrice() {
+   function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
     const vehicleClass    = selectedVehicle ? selectedVehicle.value : null;
 
     const childSeat = document.querySelector('input[name="child_seat_count"]')?.checked ?? false;
     const meetGreet = document.querySelector('input[name="meet_greet"]')?.checked ?? false;
 
-    let basePrice = 0, perKm = 0;
+    // Gammes + tarifs
+    const rates = {
+        eco:       { perKm: 1.80, minPrice: 35 }, // Gamme Eco
+        berline:   { perKm: 2.20, minPrice: 55 }, // Berline & S Class
+        van:       { perKm: 2.75, minPrice: 65 }, // Van & V Class
+        electric:  { perKm: 1.90, minPrice: 50 }, // Gamme Électrique
+    };
 
-    switch (vehicleClass) {
-        case 'business':
-            basePrice = 80; perKm = 2.0; break;
-        case 'van':
-            basePrice = 100; perKm = 2.5; break;
-        case 'sedan':
-        default:
-            basePrice = 60; perKm = 1.5;
+    let perKm = 0;
+    let minPrice = 0;
+
+    if (vehicleClass && rates[vehicleClass]) {
+        perKm    = rates[vehicleClass].perKm;
+        minPrice = rates[vehicleClass].minPrice;
+    } else {
+        // fallback
+        perKm    = 1.80;
+        minPrice = 35;
     }
 
-    let total = basePrice;
+    let total = 0;
 
-    if (currentDistance > 0) total += currentDistance * perKm;
+    if (currentDistance > 0) {
+        total = currentDistance * perKm;
+        if (total < minPrice) {
+            total = minPrice;
+        }
+    } else {
+        total = 0;
+    }
+
     if (childSeat) total += 15;
     if (meetGreet) total += 10;
 
@@ -1441,9 +1457,9 @@ window.scrollToTop    = scrollToTop;
 {{-- ============================================================
      LOAD GOOGLE MAPS (AFTER all JS ABOVE)
    ============================================================ --}}
-<script
-    src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key') }}&libraries=places&callback=initMap"
-    async defer>
+   <script
+   src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_key', env('GOOGLE_MAPS_API_KEY')) }}&libraries=places&callback=initMap"
+   async defer>
 </script>
 
 @endsection
