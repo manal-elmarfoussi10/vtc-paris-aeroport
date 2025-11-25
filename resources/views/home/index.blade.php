@@ -519,138 +519,192 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
   
       <div class="space-y-16 sm:space-y-20">
-  
-        {{-- 1) Berline Affaires --}}
+
+        {{-- 1) Gamme Eco --}}
         <article class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {{-- image (16:9) --}}
           <figure class="order-2 lg:order-1">
             <div class="relative w-full overflow-hidden rounded-2xl shadow-md bg-gray-50">
               <img
-                src="{{ asset('images/vtc9.jpg') }}"
-                alt="Berline Affaires (Mercedes Classe E, BMW Série 5 ou équivalent)"
+                src="{{ asset('images/vtc10.jpg') }}"
+                alt="Gamme Eco"
                 class="block w-full h-auto object-cover"
                 style="aspect-ratio: 16/9;"
               >
             </div>
           </figure>
-  
+
           {{-- text --}}
           <div class="order-1 lg:order-2">
-            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Service Premium
+              Gamme Eco
             </span>
-            <h3 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-900">Berline Affaires</h3>
+            <h3 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-900">Confort & Simplicité Accessible</h3>
             <p class="mt-4 text-gray-600 leading-relaxed">
-              Mercedes Classe E, BMW Série 5 ou équivalent. Idéal pour vos déplacements professionnels ou personnels.
-              Confort optimal, espace généreux et discrétion assurée pour 1 à 3 passagers.
+              Idéale pour les déplacements du quotidien, cette gamme propose des véhicules confortables, économiques et parfaitement adaptés aux trajets courts ou moyens. Une solution pratique, propre et confortable pour vos transferts.
             </p>
             <ul class="mt-6 space-y-3">
               <li class="flex items-start gap-3 text-gray-700">
                 <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Climatisation automatique
+                Confort optimal pour un excellent rapport qualité / prix
               </li>
               <li class="flex items-start gap-3 text-gray-700">
                 <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Sièges en cuir premium
+                Véhicules récents et bien entretenus
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Climatisation et espace suffisant pour vos bagages essentiels
+              </li>
+            </ul>
+            <p class="mt-5 text-sm text-gray-500">
+              Parfait pour : trajets quotidiens, déplacements professionnels rapides, transferts gares/aéroports.
+            </p>
+          </div>
+        </article>
+
+        {{-- 2) Gamme Berline & S Class --}}
+        <article class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {{-- text first on desktop --}}
+          <div class="order-1">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              Gamme Berline &amp; S Class
+            </span>
+            <h3 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-900">Élégance &amp; Prestige Professionnel</h3>
+            <p class="mt-4 text-gray-600">
+              Mercedes Classe E, S Class ou équivalent. Pensée pour les rendez-vous professionnels, les déplacements business et les clients recherchant un service haut de gamme.
+            </p>
+            <ul class="mt-6 space-y-3">
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Sièges cuir premium &amp; confort supérieur
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Grande discrétion
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Climatisation individuelle
               </li>
               <li class="flex items-start gap-3 text-gray-700">
                 <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                 Espace bagages généreux
               </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Véhicules prestige adaptés aux déplacements VIP
+              </li>
             </ul>
             <p class="mt-5 text-sm text-gray-500">
-              Parfait pour : transferts aéroports, rendez-vous d’affaires, événements.
+              Parfait pour : transferts aéroports, meetings, clients business, événements professionnels.
             </p>
-          </div>
-        </article>
-  
-        {{-- 2) Van Familial / VIP --}}
-        <article class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-          {{-- text first on desktop --}}
-          <div class="order-1">
-            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Service Familial
-            </span>
-            <h3 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-900">Van Familial / VIP</h3>
-            <p class="mt-4 text-gray-600">
-              Mercedes Classe V ou équivalent. L’espace idéal pour les familles nombreuses ou les groupes.
-              Jusqu’à 7 passagers confortablement installés avec tous leurs bagages.
-            </p>
-            <ul class="mt-6 space-y-3">
-              <li class="flex items-start gap-3 text-gray-700">
-                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                7 places assises confortables
-              </li>
-              <li class="flex items-start gap-3 text-gray-700">
-                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Espace bagages modulable
-              </li>
-              <li class="flex items-start gap-3 text-gray-700">
-                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Divans et fauteuils premium
-              </li>
-            </ul>
-            <p class="mt-5 text-sm text-gray-500">Parfait pour : familles, groupes, événements, transferts VIP.</p>
           </div>
 
           {{-- image (16:9) --}}
           <figure class="order-2">
             <div class="relative w-full overflow-hidden rounded-2xl shadow-md bg-gray-50">
               <img
-                src="{{ asset('images/vtc8.png') }}"
-                alt="Van Familial / VIP"
+                src="{{ asset('images/vtc4.jpg') }}"
+                alt="Gamme Berline &amp; S Class"
                 class="block w-full h-auto object-cover"
                 style="aspect-ratio: 16/9;"
               >
             </div>
           </figure>
         </article>
-  
-        {{-- 3) Berline Luxe --}}
+
+        {{-- 3) Gamme Van & V Class --}}
         <article class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
           {{-- image (16:9) --}}
           <figure class="order-2 lg:order-1">
             <div class="relative w-full overflow-hidden rounded-2xl shadow-md bg-gray-50">
               <img
-                src="{{ asset('images/vtc4.jpg') }}"
-                alt="Berline Luxe (Mercedes Classe S ou équivalent)"
+                src="{{ asset('images/vtc8.png') }}"
+                alt="Gamme Van &amp; V Class"
                 class="block w-full h-auto object-cover"
                 style="aspect-ratio: 16/9;"
               >
             </div>
           </figure>
-  
+
           {{-- text --}}
           <div class="order-1 lg:order-2">
-            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-purple-100 text-purple-800">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
-              Service VIP
+              Gamme Van &amp; V Class
             </span>
-            <h3 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-900">Berline Luxe</h3>
+            <h3 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-900">Espace &amp; Confort pour Groupes &amp; Familles</h3>
             <p class="mt-4 text-gray-600">
-              Mercedes Classe S ou équivalent. L’excellence absolue pour vos déplacements les plus prestigieux :
-              le summum du confort, de l’élégance et du service personnalisé.
+              Mercedes V Class ou équivalent. Un espace haut de gamme pour accueillir confortablement jusqu’à 7 passagers. Le choix idéal pour les voyages en famille ou entre amis.
             </p>
             <ul class="mt-6 space-y-3">
               <li class="flex items-start gap-3 text-gray-700">
                 <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Confort ultime et insonorisation
+                7 places assises spacieuses
               </li>
               <li class="flex items-start gap-3 text-gray-700">
                 <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Équipements high-tech
+                Grande modularité des sièges
               </li>
               <li class="flex items-start gap-3 text-gray-700">
                 <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
-                Service majordome personnalisé
+                Espace bagages XXL
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Confort VIP pour groupes
               </li>
             </ul>
-            <p class="mt-5 text-sm text-gray-500">Parfait pour : voyages d’affaires, événements prestigieux, VIP.</p>
+            <p class="mt-5 text-sm text-gray-500">
+              Parfait pour : familles, groupes, événements, transferts VIP.
+            </p>
           </div>
         </article>
-  
+
+        {{-- 4) Gamme Électrique --}}
+        <article class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          {{-- text first on desktop --}}
+          <div class="order-1">
+            <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+              <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+              Gamme Électrique
+            </span>
+            <h3 class="mt-4 text-2xl sm:text-3xl font-bold text-gray-900">Mobilité Premium 100% Écoresponsable</h3>
+            <p class="mt-4 text-gray-600">
+              Profitez d’un trajet silencieux, propre et respectueux de l’environnement avec notre gamme électrique de dernière génération : Tesla, Mercedes EQE, BMW i7 ou équivalent.
+            </p>
+            <ul class="mt-6 space-y-3">
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Trajet silencieux
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Confort ultime &amp; technologies embarquées
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Zéro émission
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Idéal pour circuler en ville sans restriction
+              </li>
+              <li class="flex items-start gap-3 text-gray-700">
+                <svg class="w-5 h-5 text-emerald-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                Design moderne &amp; expérience futuriste
+              </li>
+            </ul>
+            <p class="mt-5 text-sm text-gray-500">
+              Parfait pour : clients écologiques, déplacements urbains premium, transferts corporate.
+            </p>
+          </div>
+
+        </article>
+
       </div>
     </div>
   </section>
