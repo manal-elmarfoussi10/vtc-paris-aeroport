@@ -238,28 +238,9 @@ class BookingController extends Controller
             'origin'      => 'required|string',
             'destination' => 'required|string',
         ]);
-
+    
         $apiKey = config('services.google.maps_key', env('GOOGLE_MAPS_API_KEY'));
-
-        Log::info('Distance calculation requested', [
-            'origin' => $request->origin,
-            'destination' => $request->destination,
-            'api_key_set' => !empty($apiKey),
-        ]);
-
-        if (empty($apiKey)) {
-            Log::error('Google Maps API key is not set');
-            return response()->json([
-                'success' => true,
-                'data'    => [
-                    'distance_text'  => '0 km',
-                    'distance_value' => 0,
-                    'duration_text'  => '0 min',
-                    'duration_value' => 0,
-                ],
-            ]);
-        }
-
+    
         try {
             $response = Http::get('https://maps.googleapis.com/maps/api/distancematrix/json', [
                 'origins'      => $request->origin,
@@ -269,66 +250,36 @@ class BookingController extends Controller
                 'language'     => 'fr',
                 'key'          => $apiKey,
             ]);
-
-            Log::info('Google API response', [
-                'status' => $response->status(),
-                'successful' => $response->successful(),
-                'body' => $response->body(),
-            ]);
-
-            if (! $response->successful()) {
-                Log::error('Google API request failed', ['status' => $response->status()]);
-                return response()->json([
-                    'success' => true,
-                    'data'    => [
-                        'distance_text'  => '0 km',
-                        'distance_value' => 0,
-                        'duration_text'  => '0 min',
-                        'duration_value' => 0,
-                    ],
-                ]);
-            }
-
+    
             $data = $response->json();
-
-            if (
-                empty($data['rows']) ||
-                empty($data['rows'][0]['elements']) ||
-                empty($data['rows'][0]['elements'][0]) ||
-                $data['rows'][0]['elements'][0]['status'] === 'ZERO_RESULTS'
-            ) {
-                Log::warning('No route found or invalid response', ['data' => $data]);
-                return response()->json([
-                    'success' => true,
-                    'data'    => [
-                        'distance_text'  => '0 km',
-                        'distance_value' => 0,
-                        'duration_text'  => '0 min',
-                        'duration_value' => 0,
-                    ],
-                ]);
-            }
-
-            $element = $data['rows'][0]['elements'][0];
-
-            if ($element['status'] !== 'OK') {
-                Log::warning('Element status not OK', ['status' => $element['status'], 'element' => $element]);
-                return response()->json([
-                    'success' => true,
-                    'data'    => [
-                        'distance_text'  => '0 km',
-                        'distance_value' => 0,
-                        'duration_text'  => '0 min',
-                        'duration_value' => 0,
-                    ],
-                ]);
-            }
-
-            Log::info('Distance calculation successful', [
-                'distance' => $element['distance']['text'],
-                'duration' => $element['duration']['text'],
+    
+            // Log everything to storage/logs/laravel.log
+            Log::info('DistanceMatrix response', [
+                'origins'      => $request->origin,
+                'destinations' => $request->destination,
+                'google_data'  => $data,
             ]);
-
+    
+            // If Google itself is not OK, return the status + message so you see it in DevTools
+            if (($data['status'] ?? null) !== 'OK') {
+                return response()->json([
+                    'success' => false,
+                    'message' => $data['status'] ?? 'NO_STATUS',
+                    'error_message' => $data['error_message'] ?? null,
+                    'raw' => $data,
+                ], 400);
+            }
+    
+            $element = $data['rows'][0]['elements'][0] ?? null;
+    
+            if (!$element || ($element['status'] ?? null) !== 'OK') {
+                return response()->json([
+                    'success' => false,
+                    'message' => $element['status'] ?? 'NO_ELEMENT_STATUS',
+                    'raw' => $data,
+                ], 400);
+            }
+    
             return response()->json([
                 'success' => true,
                 'data'    => [
@@ -338,25 +289,19 @@ class BookingController extends Controller
                     'duration_value' => $element['duration']['value'],
                 ],
             ]);
+    
         } catch (\Throwable $e) {
-            Log::error('DistanceMatrix AJAX error', [
+            Log::error('DistanceMatrix exception', [
                 'error' => $e->getMessage(),
-                'origin' => $request->origin,
-                'destination' => $request->destination,
             ]);
-
+    
             return response()->json([
-                'success' => true,
-                'data'    => [
-                    'distance_text'  => '0 km',
-                    'distance_value' => 0,
-                    'duration_text'  => '0 min',
-                    'duration_value' => 0,
-                ],
-            ]);
+                'success' => false,
+                'message' => 'EXCEPTION',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
     }
-
     /**
      * Send booking confirmation email to client + admin.
      */
