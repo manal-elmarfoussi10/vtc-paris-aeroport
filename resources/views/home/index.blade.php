@@ -703,6 +703,18 @@ document.addEventListener('DOMContentLoaded', function() {
             </p>
           </div>
 
+          {{-- image (16:9) --}}
+          <figure class="order-2 lg:order-2">
+            <div class="relative w-full overflow-hidden rounded-2xl shadow-md bg-gray-50">
+              <img
+                src="{{ asset('images/vtc10.jpg') }}"
+                alt="Gamme Eco"
+                class="block w-full h-auto object-cover"
+                style="aspect-ratio: 16/9;"
+              >
+            </div>
+          </figure>
+
         </article>
 
       </div>
