@@ -241,6 +241,25 @@ class BookingController extends Controller
 
         $apiKey = config('services.google.maps_key', env('GOOGLE_MAPS_API_KEY'));
 
+        Log::info('Distance calculation requested', [
+            'origin' => $request->origin,
+            'destination' => $request->destination,
+            'api_key_set' => !empty($apiKey),
+        ]);
+
+        if (empty($apiKey)) {
+            Log::error('Google Maps API key is not set');
+            return response()->json([
+                'success' => true,
+                'data'    => [
+                    'distance_text'  => '0 km',
+                    'distance_value' => 0,
+                    'duration_text'  => '0 min',
+                    'duration_value' => 0,
+                ],
+            ]);
+        }
+
         try {
             $response = Http::get('https://maps.googleapis.com/maps/api/distancematrix/json', [
                 'origins'      => $request->origin,
@@ -251,7 +270,14 @@ class BookingController extends Controller
                 'key'          => $apiKey,
             ]);
 
+            Log::info('Google API response', [
+                'status' => $response->status(),
+                'successful' => $response->successful(),
+                'body' => $response->body(),
+            ]);
+
             if (! $response->successful()) {
+                Log::error('Google API request failed', ['status' => $response->status()]);
                 return response()->json([
                     'success' => true,
                     'data'    => [
@@ -271,6 +297,7 @@ class BookingController extends Controller
                 empty($data['rows'][0]['elements'][0]) ||
                 $data['rows'][0]['elements'][0]['status'] === 'ZERO_RESULTS'
             ) {
+                Log::warning('No route found or invalid response', ['data' => $data]);
                 return response()->json([
                     'success' => true,
                     'data'    => [
@@ -285,6 +312,7 @@ class BookingController extends Controller
             $element = $data['rows'][0]['elements'][0];
 
             if ($element['status'] !== 'OK') {
+                Log::warning('Element status not OK', ['status' => $element['status'], 'element' => $element]);
                 return response()->json([
                     'success' => true,
                     'data'    => [
@@ -296,6 +324,11 @@ class BookingController extends Controller
                 ]);
             }
 
+            Log::info('Distance calculation successful', [
+                'distance' => $element['distance']['text'],
+                'duration' => $element['duration']['text'],
+            ]);
+
             return response()->json([
                 'success' => true,
                 'data'    => [
@@ -306,7 +339,11 @@ class BookingController extends Controller
                 ],
             ]);
         } catch (\Throwable $e) {
-            Log::error('DistanceMatrix AJAX error', ['error' => $e->getMessage()]);
+            Log::error('DistanceMatrix AJAX error', [
+                'error' => $e->getMessage(),
+                'origin' => $request->origin,
+                'destination' => $request->destination,
+            ]);
 
             return response()->json([
                 'success' => true,

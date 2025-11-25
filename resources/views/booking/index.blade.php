@@ -1409,31 +1409,36 @@ function updatePrice() {
         minPrice = 35;
     }
 
-    let total = 0;
+    let total = minPrice; // Start with minimum price
 
     if (currentDistance > 0) {
         total = currentDistance * perKm;
         if (total < minPrice) {
             total = minPrice;
         }
-    } else {
-        total = 0;
     }
+    // If no distance, keep minimum price
 
     if (childSeat) total += 15;
     if (meetGreet) total += 10;
 
     const el = document.getElementById('price-estimate');
-    if (el) el.textContent = total > 0 ? `${Math.round(total)}€` : 'À calculer';
+    if (el) el.textContent = vehicleClass ? `${Math.round(total)}€` : 'À calculer';
 }
 
 /* Vehicle select */
 function selectVehicle(vehicleClass, el) {
+    console.log('selectVehicle called with:', vehicleClass, el);
     document.querySelectorAll('.service-card').forEach(card => card.classList.remove('selected'));
     el.classList.add('selected');
 
     const radio = el.querySelector('.vehicle-radio');
-    if (radio) radio.checked = true;
+    if (radio) {
+        radio.checked = true;
+        console.log('Radio checked:', radio.value);
+    } else {
+        console.log('Radio not found in el:', el);
+    }
 
     updatePrice();
 }
