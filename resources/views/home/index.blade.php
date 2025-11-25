@@ -407,9 +407,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 </h1>
 
                 <p class="text-xl sm:text-2xl text-gray-300 leading-relaxed mb-8 max-w-3xl mx-auto">
-                    Imaginez : vous arrivez à l'aéroport, stressé par les bagages et les horaires.
-                    Votre chauffeur vous attend avec un sourire, votre nom sur une pancarte élégante.
-                    <strong class="text-white">Pas de course contre la montre, juste un trajet paisible vers votre destination.</strong>
+                    Imaginez : vous arrivez à l’aéroport, stressé par les bagages et les horaires. Votre chauffeur vous attend avec un sourire, votre nom sur une pancarte élégante. Pas de course contre la montre, juste un trajet paisible vers votre destination — à Paris, en Île-de-France ou dans n’importe quelle ville de France.
+                    Que vous voyagiez vers Lyon, Bordeaux, Marseille, Lille, Nice, Strasbourg ou toute autre ville, nous assurons un service premium, ponctuel et confortable pour tous vos déplacements longue distance.
                 </p>
 
                 {{-- Social Proof Elements --}}
