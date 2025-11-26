@@ -284,8 +284,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 </a>
 
                 <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 bg-white text-blue-900 text-base leading-4 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent transition-all duration-200 mr-4 hover:bg-gray-100">
-                    Connexion
-                </a>
+                    {{-- Connexion button removed as requested --}}
+                    {{-- <a href="{{ route('login') }}" class="btn btn-primary">
+                        Connexion
+                    </a> --}}
 
                 <a href="{{ route('contact') }}" class="inline-flex items-center px-4 py-2 bg-white text-blue-900 text-base leading-4 font-medium rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent transition-all duration-200">
                     <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
