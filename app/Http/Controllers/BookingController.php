@@ -81,7 +81,7 @@ class BookingController extends Controller
         // Find the vehicle by "class" (eco / berline / van / electric)
         $vehicle = Vehicle::where('class', $validated['vehicle_class'])->first();
 
-        // Calculate price estimate
+        // Calculate price estimate (distance + per_km + min price + options)
         $price = $vehicle ? $this->calculatePriceEstimate($validated, $vehicle) : 0;
 
         $booking = Booking::create([
@@ -150,86 +150,91 @@ class BookingController extends Controller
      * Uses the SERVER distance key (GOOGLE_DISTANCE_MATRIX_KEY).
      */
     private function calculatePriceEstimate(array $data, Vehicle $vehicle): float
-{
-    $distanceKm = 0;
+    {
+        $distanceKm = 0;
 
-    try {
-        $origin      = $data['pickup_address'];
-        $destination = $data['dropoff_address'];
+        try {
+            $origin      = $data['pickup_address'];
+            $destination = $data['dropoff_address'];
 
-        // ✅ SERVER KEY (no referrer restriction)
-        $apiKey = config('services.google.distance_key', env('GOOGLE_DISTANCE_MATRIX_KEY'));
-        $url    = 'https://maps.googleapis.com/maps/api/distancematrix/json';
+            // ✅ SERVER KEY (no referrer restriction)
+            $apiKey = config('services.google.distance_key', env('GOOGLE_DISTANCE_MATRIX_KEY'));
+            $url    = 'https://maps.googleapis.com/maps/api/distancematrix/json';
 
-        $response = Http::get($url, [
-            'origins'      => $origin,
-            'destinations' => $destination,
-            'mode'         => 'driving',
-            'units'        => 'metric',
-            'language'     => 'fr',
-            'key'          => $apiKey,
-        ]);
+            $response = Http::get($url, [
+                'origins'      => $origin,
+                'destinations' => $destination,
+                'mode'         => 'driving',
+                'units'        => 'metric',
+                'language'     => 'fr',
+                'key'          => $apiKey,
+            ]);
 
-        if ($response->successful()) {
-            $json = $response->json();
+            if ($response->successful()) {
+                $json = $response->json();
 
-            if (
-                isset($json['rows'][0]['elements'][0]['status']) &&
-                $json['rows'][0]['elements'][0]['status'] === 'OK'
-            ) {
-                $distanceKm = $json['rows'][0]['elements'][0]['distance']['value'] / 1000; // m → km
+                if (
+                    isset($json['rows'][0]['elements'][0]['status']) &&
+                    $json['rows'][0]['elements'][0]['status'] === 'OK'
+                ) {
+                    // m → km
+                    $distanceKm = $json['rows'][0]['elements'][0]['distance']['value'] / 1000;
+                } else {
+                    Log::warning('DistanceMatrix price calc bad element status', [
+                        'body' => $json,
+                    ]);
+                }
             } else {
-                Log::warning('DistanceMatrix price calc bad element status', [
-                    'body' => $json,
+                Log::warning('DistanceMatrix price calc HTTP error', [
+                    'status' => $response->status(),
+                    'body'   => $response->body(),
                 ]);
             }
-        } else {
-            Log::warning('DistanceMatrix price calc HTTP error', [
-                'status' => $response->status(),
-                'body'   => $response->body(),
+        } catch (\Exception $e) {
+            Log::warning('Failed to get distance data for price calculation', [
+                'error' => $e->getMessage(),
+                'data'  => $data,
             ]);
+            $distanceKm = 0;
         }
-    } catch (\Exception $e) {
-        Log::warning('Failed to get distance data for price calculation', [
-            'error' => $e->getMessage(),
-            'data'  => $data,
-        ]);
-        $distanceKm = 0;
-    }
 
-    // ✅ Use DB tariffs
-    $perKm    = (float) ($vehicle->per_km ?? 0);
-    $minPrice = (float) ($vehicle->base_rate ?? 0);
+        // ✅ Use DB tariffs (same logique que le JS)
+        $perKm    = (float) ($vehicle->per_km ?? 0);
+        $minPrice = (float) ($vehicle->base_rate ?? 0);
 
-    // Fallbacks if DB values are missing
-    if ($perKm <= 0) {
-        $perKm = 1.80;
-    }
-    if ($minPrice <= 0) {
-        $minPrice = 35;
-    }
+        // Fallbacks if DB values are missing
+        if ($perKm <= 0) {
+            $perKm = 1.80;
+        }
+        if ($minPrice <= 0) {
+            $minPrice = 35;
+        }
 
-    $total = 0;
+        $total = 0;
 
-    if ($distanceKm > 0) {
-        $total = $distanceKm * $perKm;
+        if ($distanceKm > 0) {
+            $total = $distanceKm * $perKm;
 
-        if ($total < $minPrice) {
+            if ($total < $minPrice) {
+                $total = $minPrice;
+            }
+        } else {
+            // pas de distance => on prend au moins le tarif minimum
             $total = $minPrice;
         }
-    }
 
-    // Options (same as JS: +15€ siège enfant, +10€ meet & greet)
-    if (!empty($data['child_seat_count'])) {
-        $total += 15;
-    }
+        // Options (same as JS: +15€ siège enfant, +10€ meet & greet)
+        if (!empty($data['child_seat_count'] ?? null)) {
+            $total += 15;
+        }
 
-    if (!empty($data['meet_greet'])) {
-        $total += 10;
-    }
+        if (!empty($data['meet_greet'] ?? null)) {
+            $total += 10;
+        }
 
-    return round($total, 2);
-}
+        // On peut arrondir à l'euro comme le front si tu veux exactement pareil
+        return round($total, 0);
+    }
 
     /**
      * AJAX endpoint used by JS route('booking.distance')
