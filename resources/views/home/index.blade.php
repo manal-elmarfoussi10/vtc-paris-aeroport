@@ -283,12 +283,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     Calculer mon tarif
                 </a>
 
-                <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 bg-white text-blue-900 text-base leading-4 font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent transition-all duration-200 mr-4 hover:bg-gray-100">
-                    {{-- Connexion button removed as requested --}}
-                    {{-- <a href="{{ route('login') }}" class="btn btn-primary">
-                        Connexion
-                    </a> --}}
-
                 <a href="{{ route('contact') }}" class="inline-flex items-center px-4 py-2 bg-white text-blue-900 text-base leading-4 font-medium rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-primary focus:border-transparent transition-all duration-200">
                     <svg class="w-4 h-4 mr-2 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
@@ -357,9 +351,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             @else
                 <div class="mt-2 space-y-1 px-4">
-                    <x-responsive-nav-link :href="route('login')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
-                        {{ __('Connexion') }}
-                    </x-responsive-nav-link>
                     <x-responsive-nav-link :href="route('register')" class="text-gray-700 hover:text-blue-primary hover:bg-blue-50 transition-colors duration-200">
                         {{ __('Inscription') }}
                     </x-responsive-nav-link>
