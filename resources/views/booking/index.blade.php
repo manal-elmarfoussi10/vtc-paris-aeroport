@@ -841,8 +841,8 @@ button:active {
                         <div>
                             <h3 class="text-lg font-semibold mb-3">Classe de véhicule *</h3>
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                @foreach($vehicles as $vehicle)
-                                    <div class="service-card animate-stagger-{{ $loop->index + 1 }}">
+@foreach($vehicles as $vehicle)
+                                    <div class="service-card animate-stagger-{{ $loop->index + 1 }}" data-per-km="{{ $vehicle->per_km }}" data-base-rate="{{ $vehicle->base_rate }}">
                                         <input
                                             type="radio"
                                             class="hidden vehicle-radio"
@@ -879,7 +879,7 @@ button:active {
                                             Choisir ce véhicule
                                         </button>
                                     </div>
-                                @endforeach
+@endforeach
                             </div>
                             @error('vehicle_class')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -1384,32 +1384,21 @@ function scheduleDistanceUpdate() {
 
 function updatePrice() {
     const selectedVehicle = document.querySelector('input[name="vehicle_class"]:checked');
-    const vehicleClass    = selectedVehicle ? selectedVehicle.value : null;
 
     const childSeat = document.querySelector('input[name="child_seat_count"]')?.checked ?? false;
     const meetGreet = document.querySelector('input[name="meet_greet"]')?.checked ?? false;
 
-    // Gammes + tarifs
-    const rates = {
-        eco:       { perKm: 1.80, minPrice: 35 }, // Gamme Eco
-        berline:   { perKm: 2.20, minPrice: 55 }, // Berline & S Class
-        van:       { perKm: 2.75, minPrice: 65 }, // Van & V Class
-        electric:  { perKm: 1.90, minPrice: 50 }, // Gamme Électrique
-    };
-
-    let perKm = 0;
-    let minPrice = 0;
-
-    if (vehicleClass && rates[vehicleClass]) {
-        perKm    = rates[vehicleClass].perKm;
-        minPrice = rates[vehicleClass].minPrice;
-    } else {
-        // fallback
-        perKm    = 1.80;
-        minPrice = 35;
+    if (!selectedVehicle) {
+        const el = document.getElementById('price-estimate');
+        if (el) el.textContent = 'À calculer';
+        return;
     }
 
-    let total = minPrice; // Start with minimum price
+    const card = selectedVehicle.closest('.service-card');
+    const perKm = parseFloat(card.dataset.perKm || '0');
+    const minPrice = parseFloat(card.dataset.baseRate || '0');
+
+    let total = minPrice;
 
     if (currentDistance > 0) {
         total = currentDistance * perKm;
@@ -1417,13 +1406,12 @@ function updatePrice() {
             total = minPrice;
         }
     }
-    // If no distance, keep minimum price
 
     if (childSeat) total += 15;
     if (meetGreet) total += 10;
 
     const el = document.getElementById('price-estimate');
-    if (el) el.textContent = vehicleClass ? `${Math.round(total)}€` : 'À calculer';
+    if (el) el.textContent = `${Math.round(total)}€`;
 }
 
 /* Vehicle select */
