@@ -128,7 +128,7 @@ class BookingController extends Controller
         $this->sendBookingConfirmation($booking);
 
         return redirect()
-            ->route('booking')
+            ->route('booking.confirm', ['booking' => $booking->id])
             ->with('status', 'Votre réservation a bien été enregistrée. Nous vous contacterons rapidement.');
     }
 

@@ -28,6 +28,8 @@ Route::get('/booking', [BookingController::class, 'index'])->name('booking');
 Route::get('/booking/create', [BookingController::class, 'create'])->name('booking.create');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store');
 
+Route::get('/booking/{booking}/confirmation', [BookingController::class, 'confirm'])->name('booking.confirm');
+
 // public AJAX endpoint for distance
 Route::post('/booking/distance', [BookingController::class, 'showDistance'])
     ->name('booking.distance');
@@ -103,6 +105,19 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     });
+});
+
+Route::get('/test-smtp', function () {
+    try {
+        Mail::raw('This is a test email from Laravel SMTP.', function ($message) {
+            $message->to('manalelmarfoussi@gmail.com')
+                    ->subject('SMTP Test');
+        });
+
+        return 'Email sent — check your inbox 📩';
+    } catch (\Exception $e) {
+        return 'SMTP ERROR ❌: ' . $e->getMessage();
+    }
 });
 
 /*
