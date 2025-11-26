@@ -30,6 +30,7 @@ return [
 
     'google' => [
         'maps_key' => env('GOOGLE_MAPS_API_KEY'),
+        'distance_key' => env('GOOGLE_DISTANCE_MATRIX_KEY'),
     ],
 
     'slack' => [
