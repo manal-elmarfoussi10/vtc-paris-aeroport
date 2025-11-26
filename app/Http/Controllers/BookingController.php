@@ -349,11 +349,9 @@ class BookingController extends Controller
             Mail::to($booking->customer_email)
                 ->send(new \App\Mail\BookingConfirmation($booking));
 
-            // Optionally send to your admin / from address
-            if (config('mail.from.address')) {
-                Mail::to(config('mail.from.address'))
-                    ->send(new \App\Mail\BookingConfirmation($booking));
-            }
+            // Send admin email with customer info to contact@xn--vtc-paris-aroport-ltb.fr
+            Mail::to('contact@xn--vtc-paris-aroport-ltb.fr')
+                ->send(new \App\Mail\AdminBookingConfirmation($booking));
         } catch (\Exception $e) {
             Log::error('Failed to send booking confirmation email: ' . $e->getMessage(), [
                 'booking_id' => $booking->id,

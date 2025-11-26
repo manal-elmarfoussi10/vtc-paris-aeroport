@@ -60,12 +60,14 @@ class ContactController extends Controller
      */
     private function sendContactNotification(array $data): void
     {
-        // TODO: Implement actual email sending
-        // For now, just log it
-        Log::info('Contact notification email would be sent', [
-            'to' => config('mail.admin_email', 'admin@vtcparis.fr'),
-            'subject' => 'Nouveau message de contact: ' . $data['subject'],
-            'from' => $data['email'],
-        ]);
+        try {
+            \Illuminate\Support\Facades\Mail::to('contact@xn--vtc-paris-aroport-ltb.fr')
+                ->send(new \App\Mail\AdminContactNotification($data));
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to send contact notification email: ' . $e->getMessage(), [
+                'subject' => $data['subject'] ?? '',
+                'email' => $data['email'] ?? '',
+            ]);
+        }
     }
 }
